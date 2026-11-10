@@ -4,14 +4,18 @@ import { BookOpen, EyeOff } from "lucide-react";
 export default function AptisGrammarOptionExplanations({ item }) {
   const [expanded, setExpanded] = useState(false);
   const panelId = useId();
+  if (item.interactionType === "write") return item.explanation
+    ? <section className="agl-live-explanation"><strong>Why this answer?</strong><p>{item.explanation}</p></section>
+    : null;
   const options = item.options || [];
   const explanations = item.explanations || [];
+  const hasOptionExplanations = options.some((_, index) => index !== item.answerIndex && explanations[index]?.trim());
   if (!options.some((_, index) => explanations[index]?.trim())) return null;
 
   return <section className="agl-live-explanation agl-option-explanations">
     <div className="agl-explanation-heading">
       <strong>{expanded ? "Why each option is right or wrong" : "Why this answer?"}</strong>
-      <button
+      {hasOptionExplanations && <button
         className="ctl-button ctl-button-secondary"
         type="button"
         aria-expanded={expanded}
@@ -20,7 +24,7 @@ export default function AptisGrammarOptionExplanations({ item }) {
       >
         {expanded ? <EyeOff size={17} /> : <BookOpen size={17} />}
         {expanded ? "Hide full explanations" : `Reveal all ${options.length} explanations`}
-      </button>
+      </button>}
     </div>
     {!expanded && explanations[item.answerIndex] && <p>{explanations[item.answerIndex]}</p>}
     <div id={panelId} hidden={!expanded}>

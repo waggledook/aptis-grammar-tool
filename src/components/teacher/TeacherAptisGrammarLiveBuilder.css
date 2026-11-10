@@ -189,3 +189,5 @@
   .agl-generate-controls { width: 100%; }
   .agl-generate-controls > button { flex: 1; }
 }
+.agl-mock-review-link { color: var(--agl-muted); font-size: .9rem; line-height: 1.6; }
+.agl-mock-review-link a { color: var(--agl-accent); font-weight: 700; text-underline-offset: .2em; }

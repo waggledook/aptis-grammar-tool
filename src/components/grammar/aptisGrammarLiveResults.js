@@ -6,6 +6,15 @@ function percentage(count, total) {
   return total > 0 ? (count / total) * 100 : 0;
 }
 
+function isCorrectAnswer(item, answer) {
+  if (item?.interactionType === "write") {
+    return typeof answer?.typedAnswer === "string" && !!answer.typedAnswer.trim() && answer.correct === true;
+  }
+  const selectedIndex = answer?.selectedIndex;
+  return Number.isInteger(selectedIndex) && selectedIndex >= 0
+    && selectedIndex < (item?.options?.length || 0) && selectedIndex === item.answerIndex;
+}
+
 export function buildGrammarLiveStandings(players) {
   let rank = 0;
   let previousScore;
@@ -31,12 +40,7 @@ export function buildGrammarLiveProgress(game) {
     score: (Number(player.score) || 0) - (phase === "question"
       ? Number(game?.answers?.[questionIndex]?.[uid]?.scoreDelta) || 0 : 0),
   }]));
-  const isCorrect = (index, uid) => {
-    const selectedIndex = game?.answers?.[index]?.[uid]?.selectedIndex;
-    return Number.isInteger(selectedIndex) && selectedIndex >= 0
-      && selectedIndex < (items[index]?.options?.length || 0)
-      && selectedIndex === items[index].answerIndex;
-  };
+  const isCorrect = (index, uid) => isCorrectAnswer(items[index], game?.answers?.[index]?.[uid]);
   const standings = buildGrammarLiveStandings(visiblePlayers).map((player) => {
     const correctCount = items.slice(0, completedQuestionCount)
       .reduce((count, _, index) => count + Number(isCorrect(index, player.uid)), 0);
@@ -64,8 +68,11 @@ export function buildGrammarLiveReport(game) {
       const selectedIndex = game?.answers?.[index]?.[uid]?.selectedIndex;
       if (Number.isInteger(selectedIndex) && selectedIndex >= 0 && selectedIndex < options.length) optionCounts[selectedIndex] += 1;
     });
-    const answered = optionCounts.reduce((total, count) => total + count, 0);
-    const correct = optionCounts[item.answerIndex] || 0;
+    const isWritten = item.interactionType === "write";
+    const writtenAnswers = isWritten ? participants.map((uid) => game?.answers?.[index]?.[uid])
+      .filter((answer) => typeof answer?.typedAnswer === "string" && answer.typedAnswer.trim()) : [];
+    const answered = isWritten ? writtenAnswers.length : optionCounts.reduce((total, count) => total + count, 0);
+    const correct = isWritten ? writtenAnswers.filter((answer) => isCorrectAnswer(item, answer)).length : optionCounts[item.answerIndex] || 0;
     const incorrect = answered - correct;
     const unanswered = participantCount - answered;
     return {
@@ -78,7 +85,10 @@ export function buildGrammarLiveReport(game) {
       correctPercent: percentage(correct, participantCount),
       incorrectPercent: percentage(incorrect, participantCount),
       unansweredPercent: percentage(unanswered, participantCount),
-      options: options.map((text, optionIndex) => ({
+      options: isWritten ? [
+        { text: item.answer, index: 0, correct: true, count: correct, percent: percentage(correct, participantCount) },
+        { text: "Other answers", index: 1, correct: false, count: incorrect, percent: percentage(incorrect, participantCount) },
+      ] : options.map((text, optionIndex) => ({
         text, index: optionIndex, correct: optionIndex === item.answerIndex,
         count: optionCounts[optionIndex], percent: percentage(optionCounts[optionIndex], participantCount),
       })),

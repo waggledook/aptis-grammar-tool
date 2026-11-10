@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
   BookOpenCheck,
@@ -11,8 +11,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import Seo from "../../components/common/Seo.jsx";
 import { logOteTrainingCompleted, logOteTrainingStarted } from "../../firebase.js";
 import { getSitePath } from "../../siteConfig.js";
+import OteListeningAudioRetry from "./OteListeningAudioRetry.jsx";
 import { getAdvancedListeningPart2Set } from "./data/oteAdvancedListeningPart2.js";
 import { isAdvancedPart2AnswerCorrect } from "./utils/listeningLive.js";
+import useListeningAudio from "./utils/useListeningAudio.js";
 import "./styles/ote.css";
 
 const LISTEN_AGAIN_PROMPT_SRC = "/audio/ote/listening/instructions/now-listen-again.mp3";
@@ -199,7 +201,7 @@ export default function OteAdvancedListeningPart2Practice({ user, nativeRoutes =
   const [previewSeconds, setPreviewSeconds] = useState(practiceSet.preparationSeconds);
   const [playCount, setPlayCount] = useState(0);
   const [answers, setAnswers] = useState({});
-  const audioRef = useRef(null);
+  const { audioFailure, playRecording, stopRecording } = useListeningAudio(AUDIO_VOLUME);
   const sequenceTimeoutRef = useRef(null);
   const sequenceTokenRef = useRef(0);
   const beginSequenceRef = useRef(() => {});
@@ -214,7 +216,17 @@ export default function OteAdvancedListeningPart2Practice({ user, nativeRoutes =
   const answeredCount = practiceSet.gaps.filter((gap) => normaliseAnswer(answers[gap.id])).length;
   const isPlaying = ["instructions", "first-listen", "pause-after-first", "listen-again-cue", "pause-after-cue", "second-listen"].includes(stage);
 
-  useEffect(() => () => stopPlayback(), []);
+  const stopPlayback = useCallback(() => {
+    sequenceTokenRef.current += 1;
+    if (sequenceTimeoutRef.current) {
+      window.clearTimeout(sequenceTimeoutRef.current);
+      sequenceTimeoutRef.current = null;
+    }
+    stopRecording();
+    window.speechSynthesis?.cancel();
+  }, [stopRecording]);
+
+  useEffect(() => stopPlayback, [stopPlayback]);
 
   useEffect(() => {
     if (phase !== "active" || stage !== "preview") return undefined;
@@ -227,20 +239,6 @@ export default function OteAdvancedListeningPart2Practice({ user, nativeRoutes =
     }, 1000);
     return () => window.clearTimeout(timeoutId);
   }, [phase, previewSeconds, stage]);
-
-  function stopPlayback() {
-    sequenceTokenRef.current += 1;
-    if (sequenceTimeoutRef.current) {
-      window.clearTimeout(sequenceTimeoutRef.current);
-      sequenceTimeoutRef.current = null;
-    }
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.src = "";
-      audioRef.current = null;
-    }
-    window.speechSynthesis?.cancel();
-  }
 
   function pauseSequence(token, onComplete) {
     sequenceTimeoutRef.current = window.setTimeout(() => {
@@ -316,82 +314,24 @@ export default function OteAdvancedListeningPart2Practice({ user, nativeRoutes =
   }
 
   function playTaskInstructions(token, onComplete) {
-    if (!practiceSet.instructionAudioReady) {
+    if (practiceSet.instructionAudioReady) {
+      playRecording(practiceSet.instructionAudioSrc, onComplete);
+    } else {
       speakInstructionPreview(token, onComplete);
-      return;
     }
-
-    const audio = new Audio(practiceSet.instructionAudioSrc);
-    let fellBack = false;
-    const fallback = () => {
-      if (fellBack || token !== sequenceTokenRef.current) return;
-      fellBack = true;
-      audio.pause();
-      audioRef.current = null;
-      speakInstructionPreview(token, onComplete);
-    };
-
-    audio.preload = "auto";
-    audio.volume = AUDIO_VOLUME;
-    audio.onended = () => {
-      if (token !== sequenceTokenRef.current) return;
-      audioRef.current = null;
-      onComplete();
-    };
-    audio.onerror = fallback;
-    audioRef.current = audio;
-    audio.play().catch(fallback);
   }
 
-  function playLecture(token, onComplete) {
-    if (!practiceSet.audioReady) {
+  function playLecture(token, listenNumber, onComplete) {
+    const onStart = () => setPlayCount(listenNumber);
+    if (practiceSet.audioReady) {
+      playRecording(practiceSet.audioSrc, onComplete, { onStart });
+    } else {
+      onStart();
       speakPreview(token, onComplete);
-      return;
     }
-
-    const audio = new Audio(practiceSet.audioSrc);
-    let fellBack = false;
-    const fallback = () => {
-      if (fellBack || token !== sequenceTokenRef.current) return;
-      fellBack = true;
-      audio.pause();
-      audioRef.current = null;
-      speakPreview(token, onComplete);
-    };
-
-    audio.preload = "auto";
-    audio.volume = AUDIO_VOLUME;
-    audio.onended = () => {
-      if (token !== sequenceTokenRef.current) return;
-      audioRef.current = null;
-      onComplete();
-    };
-    audio.onerror = fallback;
-    audioRef.current = audio;
-    audio.play().catch(fallback);
-  }
-
-  function playPrompt(token, onComplete) {
-    const audio = new Audio(LISTEN_AGAIN_PROMPT_SRC);
-    let continued = false;
-    const continueSequence = () => {
-      if (continued || token !== sequenceTokenRef.current) return;
-      continued = true;
-      audio.pause();
-      audioRef.current = null;
-      onComplete();
-    };
-
-    audio.preload = "auto";
-    audio.volume = AUDIO_VOLUME;
-    audio.onended = continueSequence;
-    audio.onerror = continueSequence;
-    audioRef.current = audio;
-    audio.play().catch(continueSequence);
   }
 
   function beginListeningSequence() {
-    stopPlayback();
     const token = sequenceTokenRef.current;
 
     const finishSequence = () => {
@@ -402,23 +342,21 @@ export default function OteAdvancedListeningPart2Practice({ user, nativeRoutes =
     const playSecondLecture = () => {
       if (token !== sequenceTokenRef.current) return;
       setStage("second-listen");
-      setPlayCount(2);
-      playLecture(token, finishSequence);
+      playLecture(token, 2, finishSequence);
     };
 
     const playRepeatCue = () => {
       if (token !== sequenceTokenRef.current) return;
       setStage("listen-again-cue");
-      playPrompt(token, () => {
+      playRecording(LISTEN_AGAIN_PROMPT_SRC, () => {
         if (token !== sequenceTokenRef.current) return;
         setStage("pause-after-cue");
         pauseSequence(token, playSecondLecture);
-      });
+      }, { skipOnError: true });
     };
 
     setStage("first-listen");
-    setPlayCount(1);
-    playLecture(token, () => {
+    playLecture(token, 1, () => {
       if (token !== sequenceTokenRef.current) return;
       setStage("pause-after-first");
       pauseSequence(token, playRepeatCue);
@@ -428,7 +366,6 @@ export default function OteAdvancedListeningPart2Practice({ user, nativeRoutes =
   beginSequenceRef.current = beginListeningSequence;
 
   function beginInstructionSequence() {
-    stopPlayback();
     const token = sequenceTokenRef.current;
     setStage("instructions");
     playTaskInstructions(token, () => {
@@ -466,6 +403,9 @@ export default function OteAdvancedListeningPart2Practice({ user, nativeRoutes =
   }
 
   function finishPractice() {
+    if (stage !== "complete-notes" && !window.confirm(
+      "The second listen hasn’t finished yet. Checking answers now will end the listening practice. Check answers anyway?"
+    )) return;
     stopPlayback();
     setPhase("complete");
     setStage("idle");
@@ -592,7 +532,7 @@ export default function OteAdvancedListeningPart2Practice({ user, nativeRoutes =
               <h2>{practiceSet.instructions}</h2>
               {stage === "preview" ? <p>{practiceSet.preparationPrompt}</p> : null}
             </div>
-            <div className={`ote-recorder-timer ${stage === "preview" ? "is-answering" : isPlaying ? "is-listening" : "is-ready"}`} aria-live="polite">
+            <div className={`ote-recorder-timer ${stage === "preview" ? "is-answering" : isPlaying && !audioFailure ? "is-listening" : "is-ready"}`} aria-live="polite">
               <Headphones size={22} aria-hidden="true" />
               <strong>
                 {stage === "preview"
@@ -602,7 +542,7 @@ export default function OteAdvancedListeningPart2Practice({ user, nativeRoutes =
                     : `${playCount}/2`}
               </strong>
               <span>
-                {stage === "preview"
+                {audioFailure ? "Audio stopped" : stage === "preview"
                   ? "Preparation"
                   : stage === "instructions"
                     ? "Instructions"
@@ -612,6 +552,8 @@ export default function OteAdvancedListeningPart2Practice({ user, nativeRoutes =
               </span>
             </div>
           </div>
+
+          <OteListeningAudioRetry failure={audioFailure} />
 
           <NoteSheet
             set={practiceSet}

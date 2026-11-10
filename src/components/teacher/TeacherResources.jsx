@@ -37,6 +37,13 @@ const PRODUCT_GROUPS = [
             tags: ["A2–C1", "Custom quizzes", "Live activities"],
           },
           {
+            title: "Class mock mistake review · Live",
+            description: "Build a live quiz from your students’ mock mistakes, with a PIN lobby, timed answers, class scores and a final report.",
+            path: "/teacher-resources/grammar-vocabulary-mistakes?mode=live",
+            icon: Radio,
+            tags: ["Multi-student", "Custom mix", "Live quiz"],
+          },
+          {
             title: "Class mock mistake review",
             description: "Select allocated students, combine overlapping mock errors and run a tailored immediate-feedback review.",
             path: "/teacher-resources/grammar-vocabulary-mistakes",
@@ -343,6 +350,20 @@ const PRODUCT_GROUPS = [
       "Classroom games and activities from the wider Seif English learning hub.",
     accent: "amber",
     resources: [
+      {
+        title: "Mini grammar class practice & review",
+        description: "Build random or hand-picked quizzes from mini tests, or combine students’ mistakes for class practice.",
+        path: "/grammar/mini-tests/review?site=seifhub",
+        icon: BookOpenCheck,
+        tags: ["Multi-student", "Mini tests", "Mistake review"],
+      },
+      {
+        title: "Mini grammar class practice · Live",
+        description: "Host a timed mini grammar quiz from the question bank or students’ mistakes, with a PIN lobby and class report.",
+        path: "/grammar/mini-tests/review?mode=live&site=seifhub",
+        icon: Radio,
+        tags: ["Multi-student", "Mixed formats", "Live quiz"],
+      },
       {
         title: "Textbook vocabulary live quiz creator",
         description: "Build a random or curated live quiz using multiple choice, write and four-item matching rounds.",

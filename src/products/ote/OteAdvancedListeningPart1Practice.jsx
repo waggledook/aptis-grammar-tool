@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
   BookOpenCheck,
@@ -11,15 +11,18 @@ import { useNavigate, useParams } from "react-router-dom";
 import Seo from "../../components/common/Seo.jsx";
 import { logOteTrainingCompleted, logOteTrainingStarted } from "../../firebase.js";
 import { getSitePath } from "../../siteConfig.js";
+import OteListeningAudioRetry from "./OteListeningAudioRetry.jsx";
 import { getAdvancedListeningPart1Set } from "./data/oteAdvancedListeningPart1.js";
 import { getGeneralListeningPart1Set } from "./data/oteGeneralListeningPart1.js";
 import { getGeneralListeningPart4Set } from "./data/oteGeneralListeningPart4.js";
+import useListeningAudio from "./utils/useListeningAudio.js";
 import "./styles/ote.css";
 
 const LISTEN_AGAIN_PROMPT_SRC = "/audio/ote/listening/instructions/now-listen-again.mp3";
 const AUDIO_VOLUME = 0.82;
 const INTERSTITIAL_PAUSE_MS = 1000;
 const ANSWER_WINDOW_SECONDS = 10;
+const EARLY_EXIT_WARNING = "The second listen hasn’t finished yet. Continuing now will stop the audio. Continue anyway?";
 
 function speakerVoice(voices, speaker, lineIndex) {
   const englishVoices = voices.filter((voice) => String(voice.lang || "").toLowerCase().startsWith("en"));
@@ -206,7 +209,7 @@ export default function OteAdvancedListeningPart1Practice({
   const [isPlaying, setIsPlaying] = useState(false);
   const [questionStage, setQuestionStage] = useState("idle");
   const [answerSeconds, setAnswerSeconds] = useState(ANSWER_WINDOW_SECONDS);
-  const audioRef = useRef(null);
+  const { audioFailure, playRecording, stopRecording } = useListeningAudio(AUDIO_VOLUME);
   const sequenceTimeoutRef = useRef(null);
   const ttsTokenRef = useRef(0);
   const completionLoggedRef = useRef(false);
@@ -221,7 +224,18 @@ export default function OteAdvancedListeningPart1Practice({
   );
   const progress = (questionIndex / questions.length) * 100;
 
-  useEffect(() => () => stopPlayback(), []);
+  const stopPlayback = useCallback(() => {
+    ttsTokenRef.current += 1;
+    if (sequenceTimeoutRef.current) {
+      window.clearTimeout(sequenceTimeoutRef.current);
+      sequenceTimeoutRef.current = null;
+    }
+    stopRecording();
+    window.speechSynthesis?.cancel();
+    setIsPlaying(false);
+  }, [stopRecording]);
+
+  useEffect(() => stopPlayback, [stopPlayback]);
 
   useEffect(() => {
     if (phase !== "active" || questionStage !== "answering") return undefined;
@@ -234,21 +248,6 @@ export default function OteAdvancedListeningPart1Practice({
     }, 1000);
     return () => window.clearTimeout(timeoutId);
   }, [answerSeconds, phase, questionStage]);
-
-  function stopPlayback() {
-    ttsTokenRef.current += 1;
-    if (sequenceTimeoutRef.current) {
-      window.clearTimeout(sequenceTimeoutRef.current);
-      sequenceTimeoutRef.current = null;
-    }
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.src = "";
-      audioRef.current = null;
-    }
-    window.speechSynthesis?.cancel();
-    setIsPlaying(false);
-  }
 
   function pauseSequence(token, onComplete) {
     sequenceTimeoutRef.current = window.setTimeout(() => {
@@ -287,54 +286,15 @@ export default function OteAdvancedListeningPart1Practice({
     speakNext();
   }
 
-  function playExtract(item, token, onComplete) {
+  function playExtract(item, token, listenNumber, onComplete) {
     if (token !== ttsTokenRef.current) return;
-    if (!practiceSet.audioReady) {
+    const onStart = () => setPlayCounts((current) => ({ ...current, [item.id]: listenNumber }));
+    if (practiceSet.audioReady) {
+      playRecording(item.audioSrc, onComplete, { onStart });
+    } else {
+      onStart();
       speakPreview(item.script, token, onComplete);
-      return;
     }
-
-    const audio = new Audio(item.audioSrc);
-    let fellBack = false;
-
-    const fallback = () => {
-      if (fellBack || token !== ttsTokenRef.current) return;
-      fellBack = true;
-      audio.pause();
-      audioRef.current = null;
-      speakPreview(item.script, token, onComplete);
-    };
-
-    audio.preload = "auto";
-    audio.volume = AUDIO_VOLUME;
-    audio.onended = () => {
-      if (token !== ttsTokenRef.current) return;
-      audioRef.current = null;
-      onComplete();
-    };
-    audio.onerror = fallback;
-    audioRef.current = audio;
-    audio.play().catch(fallback);
-  }
-
-  function playPrompt(promptSrc, token, onComplete) {
-    const promptAudio = new Audio(promptSrc);
-    let continued = false;
-
-    const continueSequence = () => {
-      if (continued || token !== ttsTokenRef.current) return;
-      continued = true;
-      promptAudio.pause();
-      audioRef.current = null;
-      onComplete();
-    };
-
-    promptAudio.preload = "auto";
-    promptAudio.volume = AUDIO_VOLUME;
-    promptAudio.onended = continueSequence;
-    promptAudio.onerror = continueSequence;
-    audioRef.current = promptAudio;
-    promptAudio.play().catch(continueSequence);
   }
 
   function beginQuestionSequence(item) {
@@ -354,25 +314,23 @@ export default function OteAdvancedListeningPart1Practice({
     const playSecondExtract = () => {
       if (token !== ttsTokenRef.current) return;
       setQuestionStage("second-listen");
-      setPlayCounts((current) => ({ ...current, [item.id]: 2 }));
-      playExtract(item, token, finishSequence);
+      playExtract(item, token, 2, finishSequence);
     };
 
     const playListenAgainCue = () => {
       if (token !== ttsTokenRef.current) return;
       setQuestionStage("listen-again-cue");
-      playPrompt(LISTEN_AGAIN_PROMPT_SRC, token, () => {
+      playRecording(LISTEN_AGAIN_PROMPT_SRC, () => {
         if (token !== ttsTokenRef.current) return;
         setQuestionStage("pause-after-cue");
         pauseSequence(token, playSecondExtract);
-      });
+      }, { skipOnError: true });
     };
 
     const playFirstExtract = () => {
       if (token !== ttsTokenRef.current) return;
       setQuestionStage("first-listen");
-      setPlayCounts((current) => ({ ...current, [item.id]: 1 }));
-      playExtract(item, token, () => {
+      playExtract(item, token, 1, () => {
         if (token !== ttsTokenRef.current) return;
         setQuestionStage("pause-after-first");
         pauseSequence(token, playListenAgainCue);
@@ -385,7 +343,7 @@ export default function OteAdvancedListeningPart1Practice({
         practiceSet.instructionAudioReady !== false &&
         item.optionsAudioSrc
       ) {
-        playPrompt(item.optionsAudioSrc, token, playFirstExtract);
+        playRecording(item.optionsAudioSrc, playFirstExtract);
         return;
       }
       if (item.kind === "text") {
@@ -406,7 +364,7 @@ export default function OteAdvancedListeningPart1Practice({
       practiceSet.instructionAudioReady !== false &&
       item.instructionAudioSrc
     ) {
-      playPrompt(item.instructionAudioSrc, token, playOptions);
+      playRecording(item.instructionAudioSrc, playOptions);
       return;
     }
     speakPreview(
@@ -446,6 +404,7 @@ export default function OteAdvancedListeningPart1Practice({
 
   function reviewCurrentQuestion() {
     if (phase !== "active" || currentAnswer == null || questionStage === "reviewing") return;
+    if (isPlaying && !window.confirm(EARLY_EXIT_WARNING)) return;
     stopPlayback();
     setQuestionStage("reviewing");
     window.requestAnimationFrame(() => {
@@ -489,6 +448,7 @@ export default function OteAdvancedListeningPart1Practice({
   }
 
   function advance() {
+    if (isPlaying && !window.confirm(EARLY_EXIT_WARNING)) return;
     if (questionIndex < questions.length - 1) {
       goToQuestion(questionIndex + 1);
       return;
@@ -644,7 +604,7 @@ export default function OteAdvancedListeningPart1Practice({
               <p>{question.context}</p>
               <h2>{question.prompt}</h2>
             </div>
-            <div className={`ote-recorder-timer ${questionStage === "answering" ? "is-answering" : isPlaying ? "is-listening" : "is-ready"}`} aria-live="polite">
+            <div className={`ote-recorder-timer ${questionStage === "answering" ? "is-answering" : isPlaying && !audioFailure ? "is-listening" : "is-ready"}`} aria-live="polite">
               <Headphones size={22} aria-hidden="true" />
               <strong>
                 {questionStage === "answering"
@@ -654,7 +614,7 @@ export default function OteAdvancedListeningPart1Practice({
                     : `${currentPlayCount}/2`}
               </strong>
               <span>
-                {questionStage === "answering"
+                {audioFailure ? "Audio stopped" : questionStage === "answering"
                   ? "Answer now"
                   : questionStage === "reviewing"
                     ? "Feedback"
@@ -664,6 +624,8 @@ export default function OteAdvancedListeningPart1Practice({
               </span>
             </div>
           </div>
+
+          <OteListeningAudioRetry failure={audioFailure} />
 
           <div className="ote-listening-native-question">
             <p className="ote-instructions">

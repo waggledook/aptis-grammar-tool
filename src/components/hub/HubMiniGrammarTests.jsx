@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { QRCodeSVG } from "qrcode.react";
 import Seo from "../common/Seo.jsx";
 import { getSitePath } from "../../siteConfig.js";
@@ -10,6 +10,9 @@ import {
 } from "../../data/hubGrammarActivities.js";
 import * as fb from "../../firebase";
 import { toast } from "../../utils/toast";
+import "./HubMiniGrammarReview.css";
+import { fetchHubGrammarLearningProgress } from "../../api/hubGrammarReview.js";
+import { buildHubGrammarStudentReviewQueue, summarizeHubGrammarReview } from "../../utils/hubGrammarReview.js";
 
 function getSearchText(activity) {
   return [activity.title, activity.shortDescription, activity.intro, activity.level]
@@ -23,6 +26,7 @@ export default function HubMiniGrammarTests({ user }) {
   const [query, setQuery] = useState("");
   const [selectedLevels, setSelectedLevels] = useState([]);
   const [completedActivityIds, setCompletedActivityIds] = useState(new Set());
+  const [reviewSummary, setReviewSummary] = useState(null);
   const [students, setStudents] = useState([]);
   const [assignOverlayActivity, setAssignOverlayActivity] = useState(null);
   const [assignTargetMode, setAssignTargetMode] = useState("all");
@@ -54,11 +58,19 @@ export default function HubMiniGrammarTests({ user }) {
 
     (async () => {
       try {
-        const submissions = (await fb.fetchHubGrammarSubmissions?.(200)) || [];
+        const [submissionResult, progressResult] = await Promise.allSettled([
+          fb.fetchHubGrammarSubmissions(isTeacher ? 200 : null),
+          !isTeacher && user?.uid ? fetchHubGrammarLearningProgress(user.uid) : Promise.resolve([]),
+        ]);
         if (!alive) return;
+        if (submissionResult.status === "rejected") throw submissionResult.reason;
+        const submissions = submissionResult.value;
         setCompletedActivityIds(
           new Set(submissions.map((submission) => submission?.activityId).filter(Boolean))
         );
+        if (!isTeacher && user?.uid && progressResult.status === "fulfilled") {
+          setReviewSummary(summarizeHubGrammarReview(buildHubGrammarStudentReviewQueue(submissions, progressResult.value, user.uid)));
+        }
       } catch (error) {
         console.error("[HubMiniGrammarTests] completion load failed", error);
       }
@@ -67,7 +79,7 @@ export default function HubMiniGrammarTests({ user }) {
     return () => {
       alive = false;
     };
-  }, []);
+  }, [isTeacher, user?.uid]);
 
   useEffect(() => {
     let alive = true;
@@ -265,6 +277,18 @@ export default function HubMiniGrammarTests({ user }) {
           Back to grammar
         </button>
       </div>
+
+      <section className="hub-mini-review-entry">
+        <div>
+          <h2>{isTeacher ? "Mini grammar classroom practice" : "Review mistakes"}</h2>
+          <p>{isTeacher ? "Build a quiz from the question bank or combine students’ mistakes. Practise together or host live." : "Practise mistakes from all your mini tests, or choose specific tests. Build your review in steps of five questions."}</p>
+          {!isTeacher && reviewSummary && <p className="hub-mini-review-entry-summary">{reviewSummary.due} due now · {reviewSummary.scheduled} scheduled · {reviewSummary.mastered} mastered</p>}
+        </div>
+        <div className="hub-mini-review-entry-actions">
+          <Link to={getSitePath("/grammar/mini-tests/review")}>{isTeacher ? "Review students’ mistakes" : "Review my mistakes"}</Link>
+          {isTeacher && <><Link to={getSitePath("/grammar/mini-tests/review?source=bank")}>Build a quiz</Link><Link to={getSitePath("/grammar/mini-tests/review?mode=live")}>Host live</Link></>}
+        </div>
+      </section>
 
       <section className="hub-mini-browser">
         <div className="hub-mini-browser-head">

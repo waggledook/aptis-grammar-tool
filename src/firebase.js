@@ -2836,8 +2836,10 @@ export async function saveHubGrammarSubmission(payload) {
   if (!uid) return;
 
   const colRef = collection(db, "users", uid, "hubGrammarSubmissions");
-  await addDoc(colRef, {
+  const completedAtMs = Date.now();
+  const saved = await addDoc(colRef, {
     ...payload,
+    completedAtMs,
     app: "seifhub",
     createdAt: serverTimestamp(),
   });
@@ -2849,6 +2851,7 @@ export async function saveHubGrammarSubmission(payload) {
     correct: payload.correct ?? null,
     total: payload.total ?? null,
   });
+  return { ...payload, id: saved.id, completedAtMs };
 }
 
 export async function logHubGrammarStarted(details = {}) {
@@ -2947,7 +2950,7 @@ export async function fetchHubGrammarSubmissions(n = 20, uid) {
   const qy = query(
     collection(db, "users", realUid, "hubGrammarSubmissions"),
     orderBy("createdAt", "desc"),
-    limit(n)
+    ...(Number.isFinite(n) && n > 0 ? [limit(n)] : [])
   );
 
   const snap = await getDocs(qy);

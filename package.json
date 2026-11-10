@@ -9,6 +9,7 @@
     "emulators:functions": "npm --prefix functions run serve",
     "build": "vite build",
     "lint": "eslint .",
+    "test:mini-grammar-review": "node --experimental-vm-modules --test scripts/test-hub-grammar-mistakes.mjs scripts/test-hub-grammar-review.mjs scripts/test-hub-mini-grammar-quiz.mjs",
     "test:grammar-review": "node scripts/test-grammar-review.mjs",
     "test:gerund-infinitive": "node --test scripts/test-gerund-infinitive-activity.mjs",
     "test:aptis-grammar-live": "node --experimental-vm-modules --test scripts/test-aptis-grammar-live.mjs",

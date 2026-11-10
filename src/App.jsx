@@ -235,6 +235,7 @@ import HubGrammarMenu from "./components/hub/HubGrammarMenu.jsx";
 import HubGrammarFlashcardsMenu from "./components/hub/HubGrammarFlashcardsMenu.jsx";
 import HubFlashcardsDeckPlayer from "./components/hub/HubFlashcardsDeckPlayer.jsx";
 import HubMiniGrammarTests from "./components/hub/HubMiniGrammarTests.jsx";
+import HubMiniGrammarReview from "./components/hub/HubMiniGrammarReview.jsx";
 import HubGrammarActivityRunner from "./components/hub/HubGrammarActivityRunner.jsx";
 import HubListeningMenu from "./components/hub/HubListeningMenu.jsx";
 import HubDictationTrainer from "./components/hub/HubDictationTrainer.jsx";
@@ -1046,6 +1047,7 @@ const linkedAptisAccess = {
 const hasMemberSiteAccess = !requiresMemberAccess || (isOteSite ? hasOteAccess : hasSeifHubAccess);
 const isTeacherToolsRoute = ["/teacher-tools", "/teacher/transcription", "/live/collocations/setup", "/vocabulary/textbook/live"].includes(location.pathname)
   || location.pathname === "/teacher-resources/aptis-grammar"
+  || location.pathname === "/teacher-resources/grammar-vocabulary-mistakes"
   || location.pathname === "/teacher-resources/reading-part4-saving-smells"
   || location.pathname.startsWith("/live/aptis-reading-part4/host/")
   || location.pathname.startsWith("/live/aptis-grammar/host/")
@@ -1630,6 +1632,7 @@ return (
   <Route path="/grammar/flashcards" element={<HubGrammarFlashcardsMenu user={user} />} />
   <Route path="/grammar/flashcards/:deckId" element={<HubFlashcardsDeckPlayer user={user} />} />
   <Route path="/grammar/mini-tests" element={<HubMiniGrammarTests user={user} />} />
+  <Route path="/grammar/mini-tests/review" element={<RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}><HubMiniGrammarReview key={user?.uid} user={user} /></RequireSignedIn>} />
   <Route
     path="/grammar/aptis-mock"
     element={

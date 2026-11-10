@@ -13,7 +13,7 @@ function QuestionReport({ question, participantCount }) {
     </summary>
     <div className="agl-report-question-body"><p className="agl-report-answer-title">What the class chose <span>Percentages of all {participantCount} students</span></p>
       <div className="agl-report-answers">{question.options.map((option) => <div className={`agl-report-answer ${option.correct ? "is-correct" : ""}`} key={option.index}>
-        <div><span className="agl-option-letter">{String.fromCharCode(65 + option.index)}</span><strong>{option.text}</strong>{option.correct && <Check size={17} aria-label="Correct answer" />}<span>{option.count}/{participantCount} · <b>{formatGrammarPercent(option.percent)}</b></span></div>
+        <div>{question.item.interactionType !== "write" && <span className="agl-option-letter">{String.fromCharCode(65 + option.index)}</span>}<strong>{option.text}</strong>{option.correct && <Check size={17} aria-label="Correct answer" />}<span>{option.count}/{participantCount} · <b>{formatGrammarPercent(option.percent)}</b></span></div>
         <div className="agl-report-answer-track" aria-hidden="true"><i style={{ width: `${option.percent}%` }} /></div>
       </div>)}<div className="agl-report-answer is-unanswered"><div><strong>No answer</strong><span>{question.unanswered}/{participantCount} · <b>{formatGrammarPercent(question.unansweredPercent)}</b></span></div><div className="agl-report-answer-track" aria-hidden="true"><i style={{ width: `${question.unansweredPercent}%` }} /></div></div></div>
       <AptisGrammarOptionExplanations item={question.item} />

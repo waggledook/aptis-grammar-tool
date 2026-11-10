@@ -4,10 +4,14 @@ import {
   BookOpenCheck,
   CheckCircle2,
   LoaderCircle,
+  Radio,
   Search,
   Users,
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { createAptisMockMistakeReviewLiveGame } from "../../api/liveGames.js";
+import { getSitePath } from "../../siteConfig.js";
+import { APTIS_MOCK_MISTAKE_REVIEW_LIVE_MAX_QUESTIONS } from "../../utils/aptisMockMistakeReviewLive.js";
 import {
   fetchAptisGrammarVocabularyMockAttempts,
   listTeacherStudentsWithRosterMeta,
@@ -54,6 +58,8 @@ function clampCount(value, maximum) {
 
 export default function TeacherAptisGrammarVocabularyReview({ user }) {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const isLive = searchParams.get("mode") === "live";
   const [students, setStudents] = useState([]);
   const [studentsLoading, setStudentsLoading] = useState(true);
   const [studentsError, setStudentsError] = useState("");
@@ -68,6 +74,10 @@ export default function TeacherAptisGrammarVocabularyReview({ user }) {
   const [prioritizeFrequent, setPrioritizeFrequent] = useState(true);
   const [reviewItems, setReviewItems] = useState([]);
   const [stage, setStage] = useState("setup");
+  const [liveTitle, setLiveTitle] = useState("Class mock mistake review");
+  const [questionDuration, setQuestionDuration] = useState(30);
+  const [creatingLive, setCreatingLive] = useState(false);
+  const [liveError, setLiveError] = useState("");
   const reviewTrackingRef = useRef(null);
 
   useEffect(() => {
@@ -194,7 +204,7 @@ export default function TeacherAptisGrammarVocabularyReview({ user }) {
     );
   }
 
-  function startReview() {
+  function selectReviewItems() {
     let nextItems;
 
     if (reviewMode === "all") {
@@ -216,11 +226,37 @@ export default function TeacherAptisGrammarVocabularyReview({ user }) {
     if (prioritizeFrequent) {
       nextItems = prioritizeAptisGrammarVocabularyMistakes(nextItems);
     }
+    return nextItems;
+  }
+
+  function startReview() {
+    const nextItems = selectReviewItems();
     if (!nextItems.length) return;
     setReviewItems(nextItems);
     startReviewActivity(nextItems);
     setStage("review");
     window.scrollTo({ top: 0, behavior: "auto" });
+  }
+
+  async function hostLiveReview() {
+    if (creatingLive) return;
+    const items = selectReviewItems();
+    if (!liveTitle.trim() || items.length < 2 || items.length > APTIS_MOCK_MISTAKE_REVIEW_LIVE_MAX_QUESTIONS) return;
+    setCreatingLive(true);
+    setLiveError("");
+    try {
+      const { gameId } = await createAptisMockMistakeReviewLiveGame({
+        items,
+        title: liveTitle.trim(),
+        questionDuration,
+      });
+      navigate(getSitePath(`/live/aptis-grammar/host/${gameId}`));
+    } catch (error) {
+      console.error("[Teacher mock review] Could not create live room", error);
+      setLiveError(error?.message || "The live room could not be created. Please try again.");
+    } finally {
+      setCreatingLive(false);
+    }
   }
 
   if (stage === "review") {
@@ -261,11 +297,13 @@ export default function TeacherAptisGrammarVocabularyReview({ user }) {
 
   const customReviewTotal = clampCount(grammarCount, grammarMistakes.length)
     + clampCount(vocabularyCount, vocabularyMistakes.length);
+  const reviewTotal = reviewMode === "all" ? (mistakes?.length || 0) : customReviewTotal;
+  const reviewItemLabel = reviewTotal === 1 ? "review item" : "review items";
 
   return (
     <main className="teacher-mock-review-page game-wrapper">
       <Seo
-        title="Teacher Grammar and Vocabulary Review | Seif Aptis Trainer"
+        title={`${isLive ? "Live Mock Mistake Review" : "Teacher Grammar and Vocabulary Review"} | Seif Aptis Trainer`}
         description="Select allocated students and review their combined Aptis grammar and vocabulary mock mistakes."
       />
 
@@ -278,13 +316,15 @@ export default function TeacherAptisGrammarVocabularyReview({ user }) {
         <span aria-hidden="true"><BookOpenCheck size={34} /></span>
         <div>
           <p>Teacher mode</p>
-          <h1>Review mock mistakes with your class</h1>
+          <h1>{isLive ? "Host a live mock mistake review" : "Review mock mistakes with your class"}</h1>
           <span>
-            Select allocated students, combine their Grammar and Vocabulary mock errors, and run one immediate-feedback review.
+            Select allocated students, combine their Grammar and Vocabulary mock errors, and review together or host a live quiz.
           </span>
         </div>
       </header>
 
+      <fieldset className="teacher-mock-review-setup" disabled={creatingLive}>
+      <legend className="teacher-mock-review-sr-only">Class mock mistake review setup</legend>
       <section className="teacher-mock-review-panel" aria-labelledby="student-selection-heading">
         <div className="teacher-mock-review-panel-heading">
           <div>
@@ -470,19 +510,53 @@ export default function TeacherAptisGrammarVocabularyReview({ user }) {
                   </small>
                 </span>
               </label>
-
-              <button
-                className="teacher-mock-review-primary is-launch"
-                type="button"
-                disabled={reviewMode === "custom" && customReviewTotal === 0}
-                onClick={startReview}
-              >
-                Start {reviewMode === "all" ? `all ${mistakes.length}` : customReviewTotal} review items
-              </button>
             </>
           )}
         </section>
       ) : null}
+      {mistakes?.length > 0 && (
+        <section className="teacher-mock-review-panel" aria-labelledby="review-format-heading">
+          <div className="teacher-mock-review-panel-heading">
+            <div><span>Step 3</span><h2 id="review-format-heading">Bring it to class</h2></div>
+            <strong>{reviewTotal} {reviewItemLabel}</strong>
+          </div>
+          <div className="teacher-mock-review-modes">
+            {[{ live: false, title: "Review together", description: "One shared screen with immediate feedback." },
+              { live: true, title: "Live quiz", description: "Students join with a PIN. Timed answers, class scores and a final report." }].map((mode) => (
+              <label className={isLive === mode.live ? "is-selected" : ""} key={mode.title}>
+                <input type="radio" name="review-format" checked={isLive === mode.live} onChange={() => {
+                  setSearchParams((current) => {
+                    const next = new URLSearchParams(current);
+                    if (mode.live) next.set("mode", "live");
+                    else next.delete("mode");
+                    return next;
+                  }, { replace: true });
+                  setLiveError("");
+                }} />
+                <span><strong>{mode.title}</strong><small>{mode.description}</small></span>
+              </label>
+            ))}
+          </div>
+          {isLive && <>
+            <div className="teacher-mock-review-live-settings">
+              <label>Activity title<input value={liveTitle} maxLength={120} onChange={(event) => setLiveTitle(event.target.value)} /></label>
+              <label>Live question timer<select value={questionDuration} onChange={(event) => setQuestionDuration(Number(event.target.value))}>
+                {[15, 20, 30, 45, 60, 90].map((seconds) => <option key={seconds} value={seconds}>{seconds} seconds</option>)}
+              </select></label>
+            </div>
+            <p className="teacher-mock-review-live-hint">You control the pace and answer reveals. Includes a podium, an anonymous class report and each student’s review. At least 2 questions.</p>
+            {reviewTotal < 2 && <p className="teacher-mock-review-live-hint" role="status">Choose at least 2 review items to host live, or use Review together for a single item.</p>}
+            {reviewTotal > APTIS_MOCK_MISTAKE_REVIEW_LIVE_MAX_QUESTIONS && <p className="teacher-mock-review-live-hint" role="status">Choose a mix of up to {APTIS_MOCK_MISTAKE_REVIEW_LIVE_MAX_QUESTIONS} items for one live activity.</p>}
+            {liveError && <p className="teacher-mock-review-alert is-error" role="alert">{liveError}</p>}
+          </>}
+          <button className="teacher-mock-review-primary is-launch" type="button"
+            disabled={creatingLive || reviewTotal === 0 || (isLive && (!liveTitle.trim() || reviewTotal < 2 || reviewTotal > APTIS_MOCK_MISTAKE_REVIEW_LIVE_MAX_QUESTIONS))}
+            onClick={isLive ? hostLiveReview : startReview}>
+            {isLive ? <><Radio size={18} aria-hidden="true" />{creatingLive ? "Creating your room…" : `Host ${reviewTotal} ${reviewItemLabel} live`}</> : `Start ${reviewMode === "all" ? "all " : ""}${reviewTotal} ${reviewItemLabel}`}
+          </button>
+        </section>
+      )}
+      </fieldset>
     </main>
   );
 }

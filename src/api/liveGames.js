@@ -116,6 +116,18 @@ import {
   TEXTBOOK_VOCAB_LIVE_GAME_TYPE,
 } from "../components/hub/textbookVocabLive.js";
 import { APTIS_GRAMMAR_LIVE_GAME_TYPE } from "../components/grammar/aptisGrammarLive.js";
+import {
+  HUB_GRAMMAR_REVIEW_LIVE_SOURCE,
+  HUB_GRAMMAR_QUIZ_LIVE_SOURCE,
+  buildHubGrammarReviewLiveItems,
+  isHubGrammarLiveAnswerCorrect,
+  isHubMiniGrammarLiveSource,
+} from "../utils/hubGrammarMistakes.js";
+import {
+  APTIS_MOCK_MISTAKE_REVIEW_LIVE_MAX_QUESTIONS,
+  APTIS_MOCK_MISTAKE_REVIEW_LIVE_SOURCE,
+  buildAptisMockMistakeReviewLiveItems,
+} from "../utils/aptisMockMistakeReviewLive.js";
 
 const CUSTOM_QUIZ_GAME_TYPES = [TEXTBOOK_VOCAB_LIVE_GAME_TYPE, APTIS_GRAMMAR_LIVE_GAME_TYPE];
 
@@ -229,7 +241,7 @@ export async function createLiveGame({ setId, type = "grammar" }) {
   return { gameId, pin };
 }
 
-function cleanTextbookVocabLiveQuestion(question) {
+function cleanTextbookVocabLiveQuestion(question, maximumOptions = 4) {
   const interactionType = getTextbookVocabLiveMode(question.interactionType).id;
   const base = {
     id: String(question.id),
@@ -285,7 +297,7 @@ function cleanTextbookVocabLiveQuestion(question) {
     return { ...base, answer, acceptedAnswers };
   }
 
-  const options = (question.options || []).slice(0, 4).map((option) => String(option || "").trim());
+  const options = (question.options || []).slice(0, maximumOptions).map((option) => String(option || "").trim());
   const answerIndex = Number(question.answerIndex);
   if (
     options.length < 2 ||
@@ -325,14 +337,54 @@ export async function createAptisGrammarLiveGame({ items, title, questionDuratio
   return createCustomLiveQuiz({ items, title, questionDuration, gameType: APTIS_GRAMMAR_LIVE_GAME_TYPE });
 }
 
+export async function createAptisMockMistakeReviewLiveGame({ items, title, questionDuration } = {}) {
+  return createCustomLiveQuiz({
+    items: buildAptisMockMistakeReviewLiveItems(Array.isArray(items) ? items : []),
+    title: String(title || "").trim() || "Class mock mistake review",
+    questionDuration,
+    gameType: APTIS_GRAMMAR_LIVE_GAME_TYPE,
+    source: APTIS_MOCK_MISTAKE_REVIEW_LIVE_SOURCE,
+  });
+}
+
+export async function createHubGrammarMistakeReviewLiveGame({ items, title, questionDuration } = {}) {
+  return createCustomLiveQuiz({
+    items: buildHubGrammarReviewLiveItems(Array.isArray(items) ? items : []),
+    title: String(title || "").trim() || "Mini grammar mistake review",
+    questionDuration,
+    gameType: APTIS_GRAMMAR_LIVE_GAME_TYPE,
+    source: HUB_GRAMMAR_REVIEW_LIVE_SOURCE,
+  });
+}
+
+export async function createHubMiniGrammarQuizLiveGame({ items, title, questionDuration } = {}) {
+  return createCustomLiveQuiz({
+    items: buildHubGrammarReviewLiveItems(Array.isArray(items) ? items : []),
+    title: String(title || "").trim() || "Mini grammar class practice",
+    questionDuration,
+    gameType: APTIS_GRAMMAR_LIVE_GAME_TYPE,
+    source: HUB_GRAMMAR_QUIZ_LIVE_SOURCE,
+  });
+}
+
 // Grammar and textbook vocabulary share the same timed question/reveal lifecycle.
-async function createCustomLiveQuiz({ items, title, questionDuration, modeDurations = {}, gameType }) {
+async function createCustomLiveQuiz({ items, title, questionDuration, modeDurations = {}, gameType, source }) {
   const user = auth.currentUser;
   if (!user) throw new Error("You must be signed in to host a live quiz.");
   if (!Array.isArray(items) || items.length < 1) throw new Error("Choose questions for the live quiz.");
-  if (items.length > 50) throw new Error("Live quizzes can contain up to 50 questions.");
+  const isMockReview = source === APTIS_MOCK_MISTAKE_REVIEW_LIVE_SOURCE;
+  const maximumQuestions = isMockReview ? APTIS_MOCK_MISTAKE_REVIEW_LIVE_MAX_QUESTIONS : 50;
+  if (items.length > maximumQuestions) throw new Error(`Live quizzes can contain up to ${maximumQuestions} questions.`);
 
-  const cleanItems = items.map(cleanTextbookVocabLiveQuestion);
+  const isMiniGrammar = isHubMiniGrammarLiveSource(source);
+  const cleanItems = items.map((item) => ({
+    ...cleanTextbookVocabLiveQuestion(item, isMockReview ? 10 : 4),
+    ...(isMiniGrammar ? {
+      audioSrc: String(item.audioSrc || ""),
+      explanation: String(item.explanation || ""),
+      ...(item.acceptedAnswerGroups ? { acceptedAnswerGroups: item.acceptedAnswerGroups.map((group) => group.map(String)) } : {}),
+    } : {}),
+  }));
   const activeModes = [...new Set(cleanItems.map((item) => item.interactionType))];
   const minimumItems = activeModes.length === 1 && activeModes[0] === "matching" ? 1 : 2;
   if (cleanItems.length < minimumItems) throw new Error("Choose at least two questions for the live quiz.");
@@ -355,8 +407,9 @@ async function createCustomLiveQuiz({ items, title, questionDuration, modeDurati
   const firstDuration = cleanModeDurations[cleanItems[0].interactionType];
   await set(gameRef, {
     ownerUid: user.uid,
-    setId: isGrammar ? "aptis-grammar-custom" : "textbook-vocabulary-custom",
+    setId: isMiniGrammar ? source : isMockReview ? "aptis-mock-mistake-review" : isGrammar ? "aptis-grammar-custom" : "textbook-vocabulary-custom",
     type: gameType,
+    ...(source ? { source } : {}),
     interactionType: sessionMode,
     title: cleanTitle,
     pin,
@@ -496,7 +549,9 @@ export async function submitTextbookVocabLiveAnswer({ gameId, selectedIndex, typ
   if (interactionType === "write") {
     const cleanTypedAnswer = String(typedAnswer || "").trim().slice(0, 200);
     if (!cleanTypedAnswer) throw new Error("Write an answer before submitting.");
-    correct = isTextbookVocabLiveWrittenAnswerCorrect(cleanTypedAnswer, item.acceptedAnswers || [item.answer]);
+    correct = isHubMiniGrammarLiveSource(game.source)
+      ? isHubGrammarLiveAnswerCorrect(cleanTypedAnswer, item)
+      : isTextbookVocabLiveWrittenAnswerCorrect(cleanTypedAnswer, item.acceptedAnswers || [item.answer]);
     answerPayload = { typedAnswer: cleanTypedAnswer };
   } else if (interactionType === "matching") {
     const cleanMatches = Array.isArray(matches) ? matches.map(Number) : [];

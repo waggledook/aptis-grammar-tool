@@ -17,6 +17,8 @@ import { toast } from "../../utils/toast.js";
 import useLiveRoundTimer from "../live/useLiveRoundTimer.js";
 import { getTextbookVocabLiveMode } from "./textbookVocabLive.js";
 import { APTIS_GRAMMAR_LIVE_GAME_TYPE } from "../grammar/aptisGrammarLive.js";
+import { HUB_GRAMMAR_REVIEW_LIVE_SOURCE, HUB_GRAMMAR_QUIZ_LIVE_SOURCE } from "../../utils/hubGrammarMistakes.js";
+import { APTIS_MOCK_MISTAKE_REVIEW_LIVE_SOURCE } from "../../utils/aptisMockMistakeReviewLive.js";
 import AptisGrammarOptionExplanations from "../grammar/AptisGrammarOptionExplanations.jsx";
 import AptisGrammarLiveResults from "../grammar/AptisGrammarLiveResults.jsx";
 import "../vocabulary/collocations/CollocationTeamLive.css";
@@ -43,7 +45,10 @@ export default function TextbookVocabLiveHost({ subject = "vocabulary" }) {
   }, () => { setConnectionError("Could not connect to this live room. Please reload and try again."); setLoading(false); }), [gameId]);
 
   const isGrammar = subject === "grammar" || game?.type === APTIS_GRAMMAR_LIVE_GAME_TYPE;
-  const activityTitle = isGrammar ? "Aptis Grammar Live" : "Textbook Vocabulary Live";
+  const isMockReview = game?.source === APTIS_MOCK_MISTAKE_REVIEW_LIVE_SOURCE;
+  const isMiniReview = game?.source === HUB_GRAMMAR_REVIEW_LIVE_SOURCE;
+  const isMiniQuiz = game?.source === HUB_GRAMMAR_QUIZ_LIVE_SOURCE;
+  const activityTitle = isMiniQuiz ? "Mini Grammar Quiz Live" : isMiniReview ? "Mini Grammar Mistake Review Live" : isMockReview ? "Aptis Mock Mistake Review Live" : isGrammar ? "Aptis Grammar Live" : "Textbook Vocabulary Live";
 
   const players = useMemo(() => Object.entries(game?.players || {})
     .map(([uid, player]) => ({ uid, ...player }))
@@ -144,7 +149,7 @@ export default function TextbookVocabLiveHost({ subject = "vocabulary" }) {
 
   return (
     <main className={`ctl-page tvl-page tvl-host ${isGrammar ? "agl-live-room" : ""} ${isGrammar && phase === "finished" ? "agl-finished-room" : ""}`}>
-      {isGrammar && (phase === "lobby" || phase === "finished") && <Link className="agl-back" to={getSitePath("/teacher-resources/aptis-grammar")}>← Back to Grammar Quiz Studio</Link>}
+      {isGrammar && (phase === "lobby" || phase === "finished") && <Link className="agl-back" to={getSitePath(isMiniQuiz ? "/grammar/mini-tests/review?source=bank&mode=live" : isMiniReview ? "/grammar/mini-tests/review?mode=live" : isMockReview ? "/teacher-resources/grammar-vocabulary-mistakes?mode=live" : "/teacher-resources/aptis-grammar")}>← Back to {isMiniQuiz ? "mini grammar quiz builder" : isMiniReview ? "mini test review setup" : isMockReview ? "mock mistake review setup" : "Grammar Quiz Studio"}</Link>}
       <header className="ctl-hero">
         <div>
           <p className="ctl-kicker">{activityTitle}</p>
@@ -203,7 +208,8 @@ export default function TextbookVocabLiveHost({ subject = "vocabulary" }) {
             <div className="ctl-question-meta"><span>{interactionMode.shortLabel}</span><span>{currentItem.level?.toUpperCase()}</span><span>{currentItem.sourceThemeTitle}</span><span>{currentItem.sourceActivityTitle}</span></div>
             {interactionType !== "matching" && currentItem.image && <img className="tvl-question-media" src={currentItem.image} alt={currentItem.imageAlt || "Vocabulary question"} />}
             {interactionType !== "matching" && !currentItem.image && currentItem.colorHex && <div className="tvl-question-media tvl-colour" role="img" aria-label="Colour shown for this vocabulary question" style={{ background: currentItem.colorHex }} />}
-            <h2>{String(currentItem.text || currentItem.sentence || "").replace("___", "_____")}</h2>
+            <h2 style={{ whiteSpace: "pre-line" }}>{String(currentItem.text || currentItem.sentence || "").replace("___", "_____")}</h2>
+            {currentItem.audioSrc && <audio controls src={currentItem.audioSrc} aria-label="Question audio" />}
 
             {interactionType === "multiple-choice" && (
               <div className="ctl-option-grid ctl-option-grid-display tvl-option-grid">

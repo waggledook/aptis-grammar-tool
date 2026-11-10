@@ -4,10 +4,47 @@ import test from "node:test";
 import vm from "node:vm";
 import * as grammar from "../src/components/grammar/aptisGrammarLive.js";
 import * as vocabulary from "../src/components/hub/textbookVocabLive.js";
+import * as miniReview from "../src/utils/hubGrammarMistakes.js";
+import { HUB_GRAMMAR_ACTIVITIES } from "../src/data/hubGrammarActivities.js";
+import * as mockReviewLive from "../src/utils/aptisMockMistakeReviewLive.js";
+import { buildAptisGrammarVocabularyClassMistakes } from "../src/utils/aptisGrammarVocabularyMistakes.js";
+import { APTIS_GRAMMAR_VOCABULARY_MOCKS } from "../src/data/aptisGrammarVocabularyMocks.js";
 import { buildGrammarLiveProgress, buildGrammarLiveReport, buildGrammarLiveStandings, formatGrammarPercent } from "../src/components/grammar/aptisGrammarLiveResults.js";
 
 const rawBank = JSON.parse(await fs.readFile(new URL("./grammar-items.json", import.meta.url)));
 const bank = grammar.buildGrammarQuestionBank(rawBank);
+const mockMistakes = buildAptisGrammarVocabularyClassMistakes([{
+  student: { id: "private-source-student", displayName: "Private Source Student" },
+  attempts: APTIS_GRAMMAR_VOCABULARY_MOCKS.map((mock) => ({
+    mockId: mock.id,
+    answers: Object.fromEntries([
+      ...mock.grammarQuestions.map((question) => [question.id, question.options.find((_, index) => index !== question.correctAnswer.charCodeAt(0) - 65)]),
+      ...mock.vocabularyTasks.map((task) => [task.id, Object.fromEntries(task.rows.map((row) => [row.number, task.options.find((option) => option.value !== row.correctAnswer).value]))]),
+    ]),
+  })),
+}]);
+
+test("all six mocks convert into live questions with complete option banks, correct answers and private source students", () => {
+  assert.equal(mockMistakes.length, 300);
+  const before = JSON.stringify(mockMistakes);
+  for (const random of [() => 0, () => .5, () => .999]) {
+    const items = mockReviewLive.buildAptisMockMistakeReviewLiveItems(mockMistakes, random);
+    items.forEach((item, index) => {
+      const original = mockMistakes[index];
+      assert.equal(item.options[item.answerIndex], original.correctValue);
+      assert.equal(item.explanations[item.answerIndex], original.explanation);
+      assert.equal(item.options.length, original.kind === "grammar" ? 3 : 10);
+      assert.deepEqual([...item.options].sort(), (original.kind === "grammar" ? [...original.question.options] : original.task.options.map((option) => option.label)).sort());
+      assert.match(item.sourceActivityTitle, /Mock \d · Question \d+/);
+      assert.ok(item.sentence);
+      assert.doesNotMatch(item.sentence, /Use each word once|will not need/);
+      if (original.task?.type === "Collocations") assert.match(item.sentence, /^Choose the word that goes with:/);
+    });
+    assert.equal(new Set(items.map((item) => item.id)).size, 300);
+    assert.doesNotMatch(JSON.stringify(items), /private-source-student|Private Source Student|studentIds|studentNames/);
+  }
+  assert.equal(JSON.stringify(mockMistakes), before);
+});
 
 test("round standings hide current answers and points until reveal, then include missed questions in accuracy", () => {
   const game = {
@@ -215,6 +252,8 @@ async function apiHarness() {
     const implementations = specifier === "firebase/database" ? database
       : specifier === "../firebase" ? { auth, rtdb: {} }
         : specifier.includes("realtimeServerTime") ? { getRealtimeServerTimeOffset: async () => 500 }
+          : specifier.includes("hubGrammarMistakes") ? miniReview
+          : specifier.includes("aptisMockMistakeReviewLive") ? mockReviewLive
           : specifier.includes("aptisGrammarLive") ? grammar
             : specifier.includes("textbookVocabLive") ? vocabulary : {};
     const names = imports.get(specifier).map((name) => name.split(/\s+as\s+/)[0]);
@@ -280,4 +319,137 @@ test("both quiz types validate input and vocabulary retains its existing room id
   assert.equal(read(`liveGames/${gameId}`).state.questionDuration, 20);
   auth.currentUser = null;
   await assert.rejects(api.createAptisGrammarLiveGame({ items }), /signed in/);
+});
+
+test("mock review uses the grammar PIN lifecycle and scores choices beyond the fourth option", async () => {
+  const { api, auth, read } = await apiHarness();
+  const vocabularyMistake = mockMistakes.find((item) => item.kind === "vocabulary");
+  const { gameId, pin } = await api.createAptisMockMistakeReviewLiveGame({
+    items: [vocabularyMistake, mockMistakes[0]], title: "Class revision", questionDuration: 45,
+  });
+  const path = `liveGames/${gameId}`;
+  const room = read(path);
+  assert.equal(room.type, grammar.APTIS_GRAMMAR_LIVE_GAME_TYPE);
+  assert.equal(room.source, mockReviewLive.APTIS_MOCK_MISTAKE_REVIEW_LIVE_SOURCE);
+  assert.equal(room.title, "Class revision");
+  assert.equal(room.state.questionDuration, 45);
+  assert.equal(room.items[0].options.length, 10);
+  assert.equal(room.items[0].options[room.items[0].answerIndex], vocabularyMistake.correctValue);
+  assert.doesNotMatch(JSON.stringify(room), /private-source-student|Private Source Student|studentIds|studentNames/);
+  auth.currentUser = { uid: "student", displayName: "Live Student" };
+  assert.equal((await api.joinLiveGameByPin(pin)).gameId, gameId);
+  auth.currentUser = { uid: "teacher" };
+  await api.startTextbookVocabLiveGame(gameId);
+  auth.currentUser = { uid: "student" };
+  await api.submitTextbookVocabLiveAnswer({ gameId, selectedIndex: 9 });
+  assert.equal(read(`${path}/answers/0/student`).selectedIndex, 9);
+  assert.equal(read(`${path}/answers/0/student`).correct, room.items[0].answerIndex === 9);
+  await assert.rejects(api.submitTextbookVocabLiveAnswer({ gameId, selectedIndex: 0 }), /already locked/);
+  auth.currentUser = { uid: "teacher" };
+  await api.revealTextbookVocabLiveQuestion(gameId);
+  await api.startNextTextbookVocabLiveQuestion(gameId);
+  auth.currentUser = { uid: "student" };
+  await api.submitTextbookVocabLiveAnswer({ gameId, selectedIndex: room.items[1].answerIndex });
+  auth.currentUser = { uid: "teacher" };
+  await api.revealTextbookVocabLiveQuestion(gameId);
+  await api.startNextTextbookVocabLiveQuestion(gameId);
+  const report = buildGrammarLiveReport(read(path));
+  assert.equal(read(`${path}/status`), "finished");
+  assert.equal(report.questions[0].options.length, 10);
+  assert.equal(report.questions[0].options[9].count, 1);
+  assert.equal(report.questions[1].correct, 1);
+});
+
+test("all-errors live rooms accept all 300 mistakes while ordinary quizzes keep their 50-question limit", async () => {
+  const { api, read } = await apiHarness();
+  const { gameId } = await api.createAptisMockMistakeReviewLiveGame({ items: mockMistakes });
+  const room = read(`liveGames/${gameId}`);
+  assert.equal(room.items.length, 300);
+  assert.equal(room.title, "Class mock mistake review");
+  room.items.forEach((item, index) => assert.equal(item.options[item.answerIndex], mockMistakes[index].correctValue));
+  await assert.rejects(api.createAptisMockMistakeReviewLiveGame({ items: [] }), /Choose questions/);
+  await assert.rejects(api.createAptisMockMistakeReviewLiveGame({ items: mockMistakes.slice(0, 1) }), /at least two/);
+  await assert.rejects(api.createAptisMockMistakeReviewLiveGame({ items: [...mockMistakes, mockMistakes[0]] }), /up to 300/);
+  await assert.rejects(api.createAptisMockMistakeReviewLiveGame({ items: [{ ...mockMistakes[0], question: {} }] }), /incomplete/);
+  await assert.rejects(api.createAptisGrammarLiveGame({ items: grammar.buildGrammarLiveItems(bank.slice(0, 51)) }), /up to 50/);
+});
+
+
+test("mini grammar reviews keep source learners private and score mixed formats through the existing live lifecycle", async () => {
+  const { api, auth, read } = await apiHarness();
+  const types = ["multiple-choice", "gap-fill", "comma-placement", "audio-response"];
+  const items = types.map((type) => {
+    const activity = HUB_GRAMMAR_ACTIVITIES.find((activity) => activity.items.some((question) => question.type === type));
+    const question = activity.items.find((question) => question.type === type);
+    return { key: `${activity.id}:${question.id}`, activityTitle: activity.title,
+      number: 1, question, studentIds: ["private-student"], studentNames: ["Private Student"] };
+  });
+  const { gameId, pin } = await api.createHubGrammarMistakeReviewLiveGame({ items, title: "Mini grammar", questionDuration: 60 });
+  const path = `liveGames/${gameId}`;
+  const room = read(path);
+  assert.equal(room.source, miniReview.HUB_GRAMMAR_REVIEW_LIVE_SOURCE);
+  assert.equal(room.setId, miniReview.HUB_GRAMMAR_REVIEW_LIVE_SOURCE);
+  assert.equal(room.interactionType, "mixed");
+  assert.equal(room.items[3].audioSrc, items[3].question.audioSrc);
+  assert.ok(room.items[1].acceptedAnswerGroups);
+  assert.doesNotMatch(JSON.stringify(room), /private-student|Private Student|studentIds|studentNames/);
+  auth.currentUser = { uid: "student" };
+  await api.joinLiveGameByPin(pin);
+  auth.currentUser = { uid: "teacher" };
+  await api.startTextbookVocabLiveGame(gameId);
+  for (let index = 0; index < room.items.length; index += 1) {
+    const item = room.items[index];
+    auth.currentUser = { uid: "student" };
+    await api.submitTextbookVocabLiveAnswer({ gameId,
+      ...(item.interactionType === "write" ? { typedAnswer: item.answer } : { selectedIndex: item.answerIndex }),
+    });
+    assert.equal(read(`${path}/answers/${index}/student`).correct, true);
+    await assert.rejects(api.submitTextbookVocabLiveAnswer({ gameId, typedAnswer: item.answer, selectedIndex: item.answerIndex }), /locked/);
+    auth.currentUser = { uid: "teacher" };
+    await api.revealTextbookVocabLiveQuestion(gameId);
+    if (index < room.items.length - 1) await api.startNextTextbookVocabLiveQuestion(gameId);
+  }
+  await api.finishTextbookVocabLiveGame(gameId);
+  assert.equal(buildGrammarLiveReport(read(path)).correct, 4);
+  assert.equal(buildGrammarLiveProgress(read(path)).standings[0].correctCount, 4);
+  await assert.rejects(api.createHubGrammarMistakeReviewLiveGame({ items: Array(51).fill(items[0]) }), /up to 50/);
+});
+
+test("custom mini grammar bank quizzes retain punctuation-sensitive scoring, full gap alternatives and their own room identity", async () => {
+  const { api, auth, read } = await apiHarness();
+  const allQuestions = HUB_GRAMMAR_ACTIVITIES.flatMap((activity) => activity.items.map((question, index) => ({
+    key: `${activity.id}:${question.id}`, activityId: activity.id, activityTitle: activity.title,
+    number: index + 1, question, level: activity.level, studentIds: [],
+  })));
+  const selected = [
+    allQuestions.find((item) => item.question.type === "comma-placement" && item.question.commaPositions.length),
+    allQuestions.find((item) => item.question.id === "a2-1a-profile-1"),
+  ];
+  const { gameId, pin } = await api.createHubMiniGrammarQuizLiveGame({ items: selected, title: "Custom bank practice", questionDuration: 90 });
+  const path = `liveGames/${gameId}`;
+  const room = read(path);
+  assert.equal(room.source, miniReview.HUB_GRAMMAR_QUIZ_LIVE_SOURCE);
+  assert.equal(room.setId, miniReview.HUB_GRAMMAR_QUIZ_LIVE_SOURCE);
+  assert.equal(room.state.questionDuration, 90);
+  assert.deepEqual(room.items.map((item) => item.id), selected.map((item) => item.key));
+  assert.doesNotMatch(JSON.stringify(room), /studentIds|studentNames/);
+  auth.currentUser = { uid: "student", displayName: "Student" };
+  await api.joinLiveGameByPin(pin);
+  auth.currentUser = { uid: "teacher" };
+  await api.startTextbookVocabLiveGame(gameId);
+  auth.currentUser = { uid: "student" };
+  await api.submitTextbookVocabLiveAnswer({ gameId, typedAnswer: room.items[0].answer.replaceAll(",", "") });
+  assert.equal(read(`${path}/answers/0/student`).correct, false);
+  auth.currentUser = { uid: "teacher" };
+  await api.revealTextbookVocabLiveQuestion(gameId);
+  await api.startNextTextbookVocabLiveQuestion(gameId);
+  auth.currentUser = { uid: "student" };
+  await api.submitTextbookVocabLiveAnswer({ gameId, typedAnswer: room.items[1].acceptedAnswerGroups.map((group) => group.at(-1)).join(" / ") });
+  assert.equal(read(`${path}/answers/1/student`).correct, true);
+  auth.currentUser = { uid: "teacher" };
+  await api.revealTextbookVocabLiveQuestion(gameId);
+  await api.finishTextbookVocabLiveGame(gameId);
+  assert.equal(buildGrammarLiveReport(read(path)).correct, 1);
+  assert.equal(buildGrammarLiveReport(read(path)).incorrect, 1);
+  await assert.rejects(api.createHubMiniGrammarQuizLiveGame({ items: Array(51).fill(selected[0]) }), /up to 50/);
 });

@@ -170,6 +170,7 @@ export default function TeacherAptisGrammarLiveBuilder({ user }) {
       <div><p className="agl-eyebrow"><span /> Teacher workspace · Aptis</p><h1>Grammar Quiz Studio<span>.</span></h1><p>A little practice. A friendly challenge. A quiz that fits your class.</p></div>
       <div className="agl-bank-stat"><Library size={22} /><strong>{BANK.length}</strong><span>questions to make your own</span></div>
     </header>
+    <p className="agl-mock-review-link">Practise what your class missed. <Link to={getSitePath("/teacher-resources/grammar-vocabulary-mistakes?mode=live")}>Host a live mock mistake review →</Link></p>
     <div className="agl-workflow"><span><SlidersHorizontal size={16} /> 1. Find your focus</span><i /><span><ListChecks size={16} /> 2. Make it yours</span><i /><span><Radio size={16} /> 3. Bring it to class</span></div>
 
     <fieldset className="agl-workspace" disabled={!!busy}>

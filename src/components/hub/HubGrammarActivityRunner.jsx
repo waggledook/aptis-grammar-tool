@@ -7,31 +7,8 @@ import { getHubGrammarActivity } from "../../data/hubGrammarActivities.js";
 import { logHubGrammarStarted, saveHubGrammarSubmission } from "../../firebase";
 import { toast } from "../../utils/toast";
 
-function normalizeAnswer(text) {
-  return String(text || "")
-    .trim()
-    .toLowerCase()
-    .replace(/[\u2018\u2019\u201B\u0060\u00B4]/g, "'")
-    .replace(/[\u201C\u201D]/g, '"')
-    .replace(/^'m\b/g, "am")
-    .replace(/^'re\b/g, "are")
-    .replace(/^'ve\b/g, "have")
-    .replace(/^'ll\b/g, "will")
-    .replace(/^'s\b(?=\s+(used to|getting used to)\b)/g, "is")
-    .replace(/\b(can)'t\b/g, "$1 not")
-    .replace(/\b(won)'t\b/g, "$1 not")
-    .replace(/\b([a-z]+)n't\b/g, "$1 not")
-    .replace(/\b(i)'m\b/g, "$1 am")
-    .replace(/\b([a-z]+)'re\b/g, "$1 are")
-    .replace(/\b([a-z]+)'ve\b/g, "$1 have")
-    .replace(/\b([a-z]+)'ll\b/g, "$1 will")
-    .replace(/\b(i|you|we|they|he|she|it|that|there|here)'s used to\b/g, "$1 is used to")
-    .replace(/\b(i|you|we|they|he|she|it|that|there|here)'s getting used to\b/g, "$1 is getting used to")
-    .replace(/\b(what|who|where|when|why|how)'s\b/g, "$1 is")
-    .replace(/\s+/g, " ")
-    .replace(/\s+([?!.,])/g, "$1")
-    .replace(/[?!.,]+$/g, "");
-}
+import { normalizeHubGrammarAnswer as normalizeAnswer } from "../../utils/hubGrammarMistakes.js";
+import { saveHubGrammarSubmissionMistakes } from "../../api/hubGrammarReview.js";
 
 function buildCommaSentence(words = [], positions = []) {
   if (!Array.isArray(words) || !words.length) return "";
@@ -492,13 +469,13 @@ function renderSentence(
   });
 }
 
-export default function HubGrammarActivityRunner({ user }) {
+export default function HubGrammarActivityRunner({ user, reviewSession = null, onExitReview, onReviewComplete, onReviewItemChecked, reviewSaveStatus }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { activityId } = useParams();
-  const activity = getHubGrammarActivity(activityId);
-  const mistakeReviewRequested = new URLSearchParams(location.search).get("review") === "mistakes";
-  const mistakeReview = mistakeReviewRequested ? location.state?.grammarMistakeReview : null;
+  const activity = reviewSession?.activity || getHubGrammarActivity(activityId);
+  const mistakeReviewRequested = !!reviewSession || new URLSearchParams(location.search).get("review") === "mistakes";
+  const mistakeReview = reviewSession || (mistakeReviewRequested ? location.state?.grammarMistakeReview : null);
   const mistakeReviewItems = useMemo(
     () => getIncorrectEvaluatedItems(mistakeReview?.submission?.items || []),
     [mistakeReview]
@@ -541,6 +518,7 @@ export default function HubGrammarActivityRunner({ user }) {
   const checkedItemResultsRef = useRef({});
   const submissionStartedRef = useRef(false);
   const startLoggedRef = useRef(false);
+  const reviewRunRef = useRef(crypto.randomUUID());
   const [answers, setAnswers] = useState(() => (activity ? buildInitialAnswers(activity) : {}));
   const [confirmedCorrections, setConfirmedCorrections] = useState({});
   const [selectedAdverb, setSelectedAdverb] = useState(null);
@@ -777,6 +755,8 @@ export default function HubGrammarActivityRunner({ user }) {
     );
   }
 
+  const exitReview = () => onExitReview ? onExitReview() : navigate(-1);
+
   const markActivityStarted = () => {
     if (startLoggedRef.current) return;
     startLoggedRef.current = true;
@@ -836,9 +816,9 @@ export default function HubGrammarActivityRunner({ user }) {
   const handleSentenceAdvance = (item, key) => {
     const currentIndex = orderedInputKeys.indexOf(key);
     const nextKey = currentIndex >= 0 ? orderedInputKeys[currentIndex + 1] : null;
-    const nextKeyItemId = String(nextKey || "").split(":")[0];
+    const nextKeyIsInSameItem = String(nextKey || "").startsWith(`${item.id}:`);
 
-    if (nextKey && nextKeyItemId === item.id && inputRefs.current[nextKey]) {
+    if (nextKey && nextKeyIsInSameItem && inputRefs.current[nextKey]) {
       focusControl(nextKey);
       return;
     }
@@ -992,6 +972,7 @@ export default function HubGrammarActivityRunner({ user }) {
   };
 
   const handleReset = () => {
+    reviewRunRef.current = crypto.randomUUID();
     setAnswers(buildInitialAnswers(activity));
     setConfirmedCorrections({});
     setSelectedAdverb(null);
@@ -1030,6 +1011,10 @@ export default function HubGrammarActivityRunner({ user }) {
 
     const sourceAnswers = answerOverride || answers;
     const evaluatedItem = evaluateGrammarItem(item, sourceAnswers);
+    if (isMistakeReview) onReviewItemChecked?.({
+      eventId: `${reviewRunRef.current}:${item.id}`, itemKey: item.id,
+      isCorrect: isEvaluatedItemCorrect(evaluatedItem), answeredAtMs: Date.now(),
+    });
     const nextCheckedItemResults = {
       ...checkedItemResultsRef.current,
       [item.id]: evaluatedItem,
@@ -1059,7 +1044,8 @@ export default function HubGrammarActivityRunner({ user }) {
           score,
           total: visibleAnswerCount,
         });
-        toast("Mistake review completed.");
+        onReviewComplete?.({ correct, score, total: visibleAnswerCount });
+        toast(reviewSession?.questionSource === "bank" ? "Class practice completed." : "Mistake review completed.");
         return;
       }
 
@@ -1093,7 +1079,12 @@ export default function HubGrammarActivityRunner({ user }) {
     setSaving(true);
 
     try {
-      await saveHubGrammarSubmission(payload);
+      const savedSubmission = await saveHubGrammarSubmission(payload);
+      // The test result remains saved even if progress sync needs to be recovered
+      // from that submission the next time the review queue is loaded.
+      void saveHubGrammarSubmissionMistakes(savedSubmission).catch((error) => {
+        console.warn("[HubGrammarActivityRunner] Learning progress sync deferred", error);
+      });
       if (typeof window !== "undefined" && draftStorageKey) {
         window.localStorage.removeItem(draftStorageKey);
       }
@@ -1321,10 +1312,10 @@ export default function HubGrammarActivityRunner({ user }) {
   return (
     <div className="hub-grammar-page">
       <Seo
-        title={`${activity.title}${isMistakeReview ? " Mistake Review" : ""} | Seif Hub`}
+        title={`${activity.title}${isMistakeReview && !reviewSession ? " Mistake Review" : ""} | Seif Hub`}
         description={
           isMistakeReview
-            ? `Review incorrect answers from ${activity.title}.`
+            ? reviewSession?.questionSource === "bank" ? `Class practice: ${activity.title}.` : `Review incorrect answers from ${activity.title}.`
             : activity.shortDescription
         }
       />
@@ -1335,18 +1326,18 @@ export default function HubGrammarActivityRunner({ user }) {
             className="review-btn"
             onClick={() =>
               isMistakeReview
-                ? navigate(-1)
+                ? exitReview()
                 : navigate(getSitePath("/grammar/mini-tests"))
             }
           >
-            {isMistakeReview ? "← Back to notifications" : "← Back to mini tests"}
+            {reviewSession ? `← ${reviewSession.setupLabel || "Back to review setup"}` : isMistakeReview ? "← Back to notifications" : "← Back to mini tests"}
           </button>
         </div>
 
         <header className="hub-grammar-header">
           <div className="hub-grammar-kicker-row">
             <span className="hub-grammar-kicker">
-              {isMistakeReview ? "Mistake review" : "Seif Hub Grammar Activity"}
+              {reviewSession?.questionSource === "bank" ? "Class practice" : isMistakeReview ? "Mistake review" : "Seif Hub Grammar Activity"}
             </span>
             {!isMistakeReview && !submitted && draftStatus !== "idle" ? (
               <span className={`hub-grammar-draft-pill is-${draftStatus}`}>
@@ -1371,13 +1362,20 @@ export default function HubGrammarActivityRunner({ user }) {
           </div>
           <h1>{activity.title}</h1>
           <p>
-            {isMistakeReview
+            {reviewSession
+              ? `${visibleItems.length} questions from ${reviewSession.testCount} mini test${reviewSession.testCount === 1 ? "" : "s"}${reviewSession.studentCount ? ` · ${reviewSession.studentCount} students` : ""}. Try each question again for instant feedback.`
+              : isMistakeReview
               ? `${mistakeReview.studentLabel || "Student"} · ${mistakeAnswerCount} incorrect ${
                   mistakeAnswerCount === 1 ? "answer" : "answers"
                 } across ${visibleItems.length} ${visibleItems.length === 1 ? "question" : "questions"}. The answers have been cleared so these questions can be tried again.`
               : activity.intro}
           </p>
         </header>
+
+        {reviewSaveStatus && <div className="hub-grammar-review-save" role={reviewSaveStatus.error ? "alert" : "status"}>
+          {reviewSaveStatus.error ? <>Some review progress could not be saved. <button className="review-btn" type="button" onClick={reviewSaveStatus.retry}>Retry saving progress</button></>
+            : reviewSaveStatus.saving ? "Saving your review progress…" : "Review progress is saved after each answer."}
+        </div>}
 
         {showShareModal ? (
           <div className="hub-grammar-share-overlay" onClick={() => setShowShareModal(false)}>
@@ -1429,20 +1427,20 @@ export default function HubGrammarActivityRunner({ user }) {
         {isMistakeReview ? (
           <section className="hub-grammar-summary">
             <div>
-              <span className="hub-grammar-summary-label">Original score</span>
-              <strong>{mistakeReview.submission.score ?? 0}%</strong>
+              <span className="hub-grammar-summary-label">{reviewSession ? "Questions" : "Original score"}</span>
+              <strong>{reviewSession ? visibleItems.length : `${mistakeReview.submission.score ?? 0}%`}</strong>
             </div>
             <div>
               <span className="hub-grammar-summary-label">
-                {result ? "Review score" : "Incorrect"}
+                {result ? reviewSession?.questionSource === "bank" ? "Practice score" : "Review score" : reviewSession ? "Answers to practise" : "Incorrect"}
               </span>
               <strong>
-                {result ? `${result.correct}/${result.total}` : mistakeAnswerCount}
+                {result ? `${result.correct}/${result.total}` : reviewSession ? visibleAnswerCount : mistakeAnswerCount}
               </strong>
             </div>
             <div>
-              <span className="hub-grammar-summary-label">Completed</span>
-              <strong>{formatReviewDate(mistakeReview.completedAtMs)}</strong>
+              <span className="hub-grammar-summary-label">{reviewSession ? "Status" : "Completed"}</span>
+              <strong>{reviewSession ? (result ? reviewSession.questionSource === "bank" ? "Practice complete" : "Review complete" : "In progress") : formatReviewDate(mistakeReview.completedAtMs)}</strong>
             </div>
           </section>
         ) : result ? (
@@ -1491,7 +1489,7 @@ export default function HubGrammarActivityRunner({ user }) {
                   <span className="hub-grammar-number">
                     {isMistakeReview ? originalItemNumber : index + 1}
                   </span>
-                  <p>{item.prompt}</p>
+                  {item.sourceLabel ? <div><small className="muted">{item.sourceLabel}</small><p>{item.prompt}</p></div> : <p>{item.prompt}</p>}
                 </div>
 
                 {item.imageSrc ? (
@@ -2052,10 +2050,10 @@ export default function HubGrammarActivityRunner({ user }) {
           {isMistakeReview ? (
             <>
               <button className="review-btn" onClick={handleReset}>
-                {submitted ? "Try review again" : "Clear review answers"}
+                {reviewSession?.questionSource === "bank" ? submitted ? "Try practice again" : "Clear practice answers" : submitted ? "Try review again" : "Clear review answers"}
               </button>
-              <button className="ghost-btn" onClick={() => navigate(-1)}>
-                Back to notifications
+              <button className="ghost-btn" onClick={exitReview}>
+                {reviewSession ? reviewSession.setupLabel || "Back to review setup" : "Back to notifications"}
               </button>
             </>
           ) : (

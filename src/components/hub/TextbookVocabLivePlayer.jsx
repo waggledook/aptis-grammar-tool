@@ -4,11 +4,16 @@ import { Check, LockKeyhole, Send } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 
 import { submitTextbookVocabLiveAnswer } from "../../api/liveGames.js";
+import { fetchHubGrammarReviewData } from "../../api/hubGrammarReview.js";
+import { buildHubGrammarStudentReviewQueue, getHubGrammarLiveReviewEvents } from "../../utils/hubGrammarReview.js";
+import useHubGrammarReviewSaving from "./useHubGrammarReviewSaving.js";
 import { auth, rtdb } from "../../firebase.js";
 import { toast } from "../../utils/toast.js";
 import useLiveRoundTimer from "../live/useLiveRoundTimer.js";
 import { getTextbookVocabLiveMode } from "./textbookVocabLive.js";
 import { APTIS_GRAMMAR_LIVE_GAME_TYPE } from "../grammar/aptisGrammarLive.js";
+import { HUB_GRAMMAR_REVIEW_LIVE_SOURCE, HUB_GRAMMAR_QUIZ_LIVE_SOURCE, isHubMiniGrammarLiveSource } from "../../utils/hubGrammarMistakes.js";
+import { APTIS_MOCK_MISTAKE_REVIEW_LIVE_SOURCE } from "../../utils/aptisMockMistakeReviewLive.js";
 import AptisGrammarPodium from "../grammar/AptisGrammarPodium.jsx";
 import AptisGrammarLiveLeaderboard from "../grammar/AptisGrammarLiveLeaderboard.jsx";
 import { buildGrammarLiveProgress } from "../grammar/aptisGrammarLiveResults.js";
@@ -25,6 +30,9 @@ export default function TextbookVocabLivePlayer({ subject = "vocabulary" }) {
   const [typedAnswer, setTypedAnswer] = useState("");
   const [matches, setMatches] = useState([]);
   const [connectionError, setConnectionError] = useState("");
+  const [ownReviewData, setOwnReviewData] = useState(null);
+  const [reviewLoadError, setReviewLoadError] = useState(false);
+  const [reviewRetry, setReviewRetry] = useState(0);
 
   useEffect(() => onValue(ref(rtdb, `liveGames/${gameId}`), (snapshot) => {
     setGame(snapshot.exists() ? snapshot.val() : null);
@@ -32,9 +40,29 @@ export default function TextbookVocabLivePlayer({ subject = "vocabulary" }) {
   }, () => { setConnectionError("Could not connect to this live room. Please reload and try again."); setLoading(false); }), [gameId]);
 
   const isGrammar = subject === "grammar" || game?.type === APTIS_GRAMMAR_LIVE_GAME_TYPE;
-  const activityTitle = isGrammar ? "Aptis Grammar Live" : "Textbook Vocabulary Live";
+  const isMockReview = game?.source === APTIS_MOCK_MISTAKE_REVIEW_LIVE_SOURCE;
+  const isMiniReview = game?.source === HUB_GRAMMAR_REVIEW_LIVE_SOURCE;
+  const isMiniQuiz = game?.source === HUB_GRAMMAR_QUIZ_LIVE_SOURCE;
+  const activityTitle = isMiniQuiz ? "Mini Grammar Quiz Live" : isMiniReview ? "Mini Grammar Mistake Review Live" : isMockReview ? "Aptis Mock Mistake Review Live" : isGrammar ? "Aptis Grammar Live" : "Textbook Vocabulary Live";
 
+  const isMiniGrammar = isHubMiniGrammarLiveSource(game?.source);
   const uid = auth.currentUser?.uid || "";
+  const reviewSaving = useHubGrammarReviewSaving(uid);
+  useEffect(() => {
+    let alive = true;
+    setOwnReviewData(null);
+    setReviewLoadError(false);
+    if (isMiniGrammar && uid) fetchHubGrammarReviewData(uid)
+      .then((data) => { if (alive) setOwnReviewData(data); })
+      .catch((error) => { console.warn("[Mini grammar live] Review progress load failed", error); if (alive) setReviewLoadError(true); });
+    return () => { alive = false; };
+  }, [isMiniGrammar, uid, gameId, reviewRetry]);
+  const ownQueue = useMemo(() => ownReviewData
+    ? buildHubGrammarStudentReviewQueue(ownReviewData.submissions, ownReviewData.progress, uid) : [], [ownReviewData, uid]);
+  useEffect(() => {
+    if (!ownReviewData) return;
+    for (const event of getHubGrammarLiveReviewEvents(gameId, game, uid, ownQueue)) reviewSaving.queueAnswer(event);
+  }, [gameId, game, uid, ownQueue, ownReviewData, reviewSaving.queueAnswer]);
   const me = uid ? game?.players?.[uid] : null;
   const status = game?.status || "lobby";
   const phase = game?.state?.phase || "lobby";
@@ -134,6 +162,12 @@ export default function TextbookVocabLivePlayer({ subject = "vocabulary" }) {
         {me && <span className="ctl-team-badge">{displayedScore} pts{myRank ? ` · #${myRank}` : ""}</span>}
       </header>
 
+      {isMiniGrammar && (reviewLoadError || reviewSaving.error) && <div className="ctl-panel" role="alert">
+        <p>Your live answers are recorded, but your review schedule could not be updated yet.</p>
+        <button className="ctl-button ctl-button-secondary" type="button" onClick={() => { if (reviewLoadError) setReviewRetry((value) => value + 1); reviewSaving.retry(); }}>Retry saving review progress</button>
+      </div>}
+      {isMiniGrammar && reviewSaving.saving && <p role="status">Saving your personal review progress…</p>}
+
       {phase === "lobby" && (
         <section className="ctl-panel ctl-player-lobby">
           {!me ? <><span className="ctl-label">Not joined</span><h2>Enter this room through the join page</h2><p>Your teacher can share the PIN or QR link with you.</p></> : <><span className="ctl-label">You’re in</span><h2>Hi, {me.name || "player"}</h2><p>Waiting for your teacher to start the first {interactionType === "matching" ? "round" : "question"}.</p><div className="ctl-player-list ctl-player-list-centred">{players.map((player) => <span className="ctl-player-chip" key={player.uid}>{player.name || "Player"}</span>)}</div></>}
@@ -154,7 +188,8 @@ export default function TextbookVocabLivePlayer({ subject = "vocabulary" }) {
             <div className="ctl-question-meta"><span>{interactionMode.shortLabel}</span><span>{currentItem.level?.toUpperCase()}</span><span>{currentItem.sourceThemeTitle}</span><span>{currentItem.sourceActivityTitle}</span></div>
             {interactionType !== "matching" && currentItem.image && <img className="tvl-question-media" src={currentItem.image} alt={currentItem.imageAlt || "Vocabulary question"} />}
             {interactionType !== "matching" && !currentItem.image && currentItem.colorHex && <div className="tvl-question-media tvl-colour" role="img" aria-label="Colour shown for this vocabulary question" style={{ background: currentItem.colorHex }} />}
-            <h2>{String(currentItem.text || currentItem.sentence || "").replace("___", "_____")}</h2>
+            <h2 style={{ whiteSpace: "pre-line" }}>{String(currentItem.text || currentItem.sentence || "").replace("___", "_____")}</h2>
+            {currentItem.audioSrc && <audio controls src={currentItem.audioSrc} aria-label="Question audio" />}
 
             {interactionType === "multiple-choice" && (
               <div className="ctl-option-grid tvl-option-grid">
@@ -204,7 +239,7 @@ export default function TextbookVocabLivePlayer({ subject = "vocabulary" }) {
             {isQuestion && !myAnswer && remainingSeconds === 0 && <p className="ctl-discuss-note">Time is up. Waiting for the answer reveal.</p>}
             {isReveal && interactionType !== "matching" && <div className={`tvl-personal-feedback ${myAnswer?.correct ? "is-correct" : "is-wrong"}`}><strong>{myAnswer?.correct ? "That’s right." : `Correct answer: ${currentItem.answer || currentItem.options?.[currentItem.answerIndex] || ""}`}</strong>{myAnswer?.correct ? <span>You earned {myAnswer.scoreDelta || 0} points.</span> : <span>Use the feedback before the next question begins.</span>}</div>}
             {isReveal && interactionType === "matching" && <div className={`tvl-personal-feedback ${myAnswer?.correct ? "is-correct" : "is-wrong"}`}><strong>{myAnswer ? `${myAnswer.correctCount || 0} of ${myAnswer.totalCount || 4} matches correct.` : "No matches submitted."}</strong><span>{myAnswer ? `You earned ${myAnswer.scoreDelta || 0} points.` : "Review the four correct pairs above."}</span></div>}
-            {isGrammar && isReveal && currentItem.explanations?.[currentItem.answerIndex] && <div className="agl-live-explanation">{currentItem.explanations[currentItem.answerIndex]}</div>}
+            {isGrammar && isReveal && (currentItem.explanation || currentItem.explanations?.[currentItem.answerIndex]) && <div className="agl-live-explanation">{currentItem.explanation || currentItem.explanations[currentItem.answerIndex]}</div>}
           </section>
           {isGrammar && <AptisGrammarLiveLeaderboard progress={grammarProgress} myUid={uid} />}
         </>
@@ -219,9 +254,9 @@ export default function TextbookVocabLivePlayer({ subject = "vocabulary" }) {
           {me && <div className="ctl-personal-result"><strong>{Number(me.score) || 0}</strong><span>total points</span></div>}
           <div className="ctl-results-grid tvl-player-results">{players.slice(0, 5).map((player, index) => <article className="ctl-result-card" key={player.uid}><span>#{index + 1}</span><h3>{player.name || "Player"}</h3><strong>{Number(player.score) || 0}</strong><span>points</span></article>)}</div>
           </>}
-          {isGrammar && me && <div className="agl-live-review"><h3>Your grammar review</h3>{items.map((item, index) => {
+          {isGrammar && me && <div className="agl-live-review"><h3>{isMiniQuiz ? "Your mini grammar quiz" : isMiniReview ? "Your mini test mistake review" : isMockReview ? "Your mock mistake review" : "Your grammar review"}</h3>{items.map((item, index) => {
             const answer = game.answers?.[index]?.[uid];
-            return <details key={item.id}><summary>{index + 1}. {item.sentence}<small>{answer?.correct ? "Correct" : answer ? "Review this answer" : "No answer"}</small></summary><p>Your answer: {item.options?.[answer?.selectedIndex] || "Not answered"}</p><p>Correct answer: <strong>{item.options?.[item.answerIndex]}</strong></p><p>{item.explanations?.[item.answerIndex]}</p></details>;
+            return <details key={item.id}><summary>{index + 1}. {item.sentence}<small>{answer?.correct ? "Correct" : answer ? "Review this answer" : "No answer"}</small></summary><p>Your answer: {answer?.typedAnswer || item.options?.[answer?.selectedIndex] || "Not answered"}</p><p>Correct answer: <strong>{item.answer || item.options?.[item.answerIndex]}</strong></p><p>{item.explanation || item.explanations?.[item.answerIndex]}</p></details>;
           })}</div>}
         </section>
       )}
