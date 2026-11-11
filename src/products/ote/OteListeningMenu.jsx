@@ -378,6 +378,15 @@ function OteListeningPartShell({ user, nativeRoutes = false }) {
         </div>
       </section>
 
+      {canHostLive && variant === "advanced" && partId === "part-2-note-completion" ? (
+        <section className="ote-training-section ote-teacher-practice-section">
+          <p className="ote-kicker">Teacher resource · Flexible timing</p>
+          <h2>Finding the right detail</h2>
+          <p>Choose short extracts to practise prediction, paraphrase and precise answers before a full task. Open a classroom lesson, print student notes or run a live room with teacher-controlled delivery.</p>
+          <button className="topbar-btn" type="button" onClick={() => navigate(getSitePath(`${basePath}/advanced/part-2-note-completion/strategy-lesson`))}>Open strategy lesson</button>
+        </section>
+      ) : null}
+
       {teacherPracticeSets.length ? (
         <section
           className="ote-training-section ote-teacher-practice-section"

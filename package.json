@@ -21,6 +21,8 @@
     "test:aptis-mock-review-activity": "node --test scripts/test-aptis-mock-mistake-review-activity.mjs",
     "preview": "vite preview",
     "content:export:keyword": "node scripts/export-keyword-content.mjs",
+    "content:export:ote-listening-strategy": "node scripts/export-ote-listening-part2-strategy.mjs",
+    "test:ote-listening-strategy": "node --test scripts/test-ote-listening-part2-strategy.mjs && node scripts/export-ote-listening-part2-strategy.mjs --check",
     "content:export:opencloze": "node scripts/export-open-cloze-content.mjs",
     "content:export:wordformation": "node scripts/export-word-formation-content.mjs",
     "content:sync:keyword": "node scripts/sync-keyword-content.mjs",

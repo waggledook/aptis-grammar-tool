@@ -1,0 +1,61 @@
+.aptis-suggestion-banner .aptis-suggestion-labels {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .35rem .65rem;
+  margin-bottom: .55rem;
+}
+
+.aptis-suggestion-banner .whats-new-label {
+  margin-bottom: 0;
+}
+
+.aptis-suggestion-skill {
+  color: var(--color-text-soft);
+  font-size: .8rem;
+  font-weight: 700;
+}
+
+.aptis-suggestion-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: .55rem;
+}
+
+.aptis-suggestion-actions .whats-new-btn {
+  gap: .5rem;
+  white-space: nowrap;
+}
+
+.aptis-suggestion-another {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .4rem;
+  min-height: 44px;
+  padding: .45rem .7rem;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--color-text-soft);
+  font-size: .85rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.aptis-suggestion-another:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.aptis-suggestion-actions button:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 4px;
+}
+
+@media (min-width: 760px) {
+  .menu-style-hub .aptis-suggestion-banner {
+    min-height: 220px;
+  }
+}

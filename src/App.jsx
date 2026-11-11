@@ -270,6 +270,8 @@ import OteAdvancedListeningPart1Guide from "./products/ote/OteAdvancedListeningP
 import OteAdvancedListeningPart1Practice from "./products/ote/OteAdvancedListeningPart1Practice.jsx";
 import OteAdvancedListeningPart2Guide from "./products/ote/OteAdvancedListeningPart2Guide.jsx";
 import OteAdvancedListeningPart2Practice from "./products/ote/OteAdvancedListeningPart2Practice.jsx";
+import OteListeningPart2StrategyLesson from "./products/ote/OteListeningPart2StrategyLesson.jsx";
+import { OteListeningPart2StrategyLiveHost, OteListeningPart2StrategyLivePlayer } from "./products/ote/OteListeningPart2StrategyLive.jsx";
 import OteAdvancedListeningPart3Guide from "./products/ote/OteAdvancedListeningPart3Guide.jsx";
 import OteAdvancedListeningPart3Practice from "./products/ote/OteAdvancedListeningPart3Practice.jsx";
 import OteGeneralListeningPart1Guide from "./products/ote/OteGeneralListeningPart1Guide.jsx";
@@ -1705,6 +1707,7 @@ return (
     }
   />
   <Route path="/ote/listening" element={<OteListeningMenu user={user} nativeRoutes={false} />} />
+  <Route path="/ote/listening/advanced/part-2-note-completion/strategy-lesson" element={<RequireTeacher user={user}><OteListeningPart2StrategyLesson /></RequireTeacher>} />
   <Route
     path="/ote/listening/advanced/part-1-short-extracts/guide"
     element={<OteAdvancedListeningPart1Guide nativeRoutes={false} />}
@@ -2161,6 +2164,7 @@ return (
         path="/listening/general/part-4-text-options/practice/:setId"
         element={<OteGeneralListeningPart4Practice user={user} nativeRoutes />}
       />
+      <Route path="/listening/advanced/part-2-note-completion/strategy-lesson" element={<RequireTeacher user={user}><OteListeningPart2StrategyLesson nativeRoutes /></RequireTeacher>} />
       <Route
         path="/listening/:variant/:partId"
         element={<OteListeningPartShell user={user} nativeRoutes />}
@@ -3499,6 +3503,8 @@ return (
 <Route path="/live/part4-evidence/play/:gameId" element={<OteReadingPart4EvidenceLivePlayer />} />
 <Route path="/live/ote-listening/host/:gameId" element={<RequireTeacher user={user}><OteListeningLiveHost user={user} /></RequireTeacher>} />
 <Route path="/live/ote-listening/play/:gameId" element={<OteListeningLivePlayer />} />
+<Route path="/live/ote-listening-strategy/host/:gameId" element={<RequireTeacher user={user}><OteListeningPart2StrategyLiveHost user={user} /></RequireTeacher>} />
+<Route path="/live/ote-listening-strategy/play/:gameId" element={<RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}><OteListeningPart2StrategyLivePlayer /></RequireSignedIn>} />
 <Route path="/live/ote-reading-part2/host/:gameId" element={<RequireTeacher user={user}><OteAdvancedReadingPart2LiveHost user={user} /></RequireTeacher>} />
 <Route path="/live/ote-reading-part2/play/:gameId" element={<RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}><OteAdvancedReadingPart2LivePlayer /></RequireSignedIn>} />
 <Route path="/live/ote-reading-part2-paragraph/host/:gameId" element={<RequireTeacher user={user}><OteAdvancedReadingPart2ParagraphLiveHost user={user} /></RequireTeacher>} />

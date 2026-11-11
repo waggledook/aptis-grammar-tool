@@ -273,6 +273,13 @@ const PRODUCT_GROUPS = [
             tags: ["Advanced Listening", "Direct link", "Live lesson"],
           },
           {
+            title: "Advanced Listening Part 2 · Finding the right detail",
+            description: "Choose short strategy extracts for a quick focus or a complete lesson, with printable notes, teacher-read delivery and a live mode.",
+            path: "/ote/listening/advanced/part-2-note-completion/strategy-lesson",
+            icon: Headphones,
+            tags: ["Flexible timing", "Teacher resource", "Live lesson"],
+          },
+          {
             title: "Advanced Listening Part 2 · Dictionary words",
             description: "A C1 note-completion lecture about how dictionaries select new words, with independent and live classroom modes.",
             path: "/ote/listening/advanced/part-2-note-completion#teacher-listening-tasks",
@@ -289,6 +296,13 @@ const PRODUCT_GROUPS = [
           {
             title: "Advanced Listening Part 3 · Analogue media",
             description: "A C1 discussion about vinyl and film photography with detailed attribution feedback and a teacher-controlled live mode.",
+            path: "/ote/listening/advanced/part-3-opinion-matching#teacher-listening-tasks",
+            icon: Headphones,
+            tags: ["Advanced Listening", "Direct link", "Live lesson"],
+          },
+          {
+            title: "Advanced Listening Part 3 · Algorithms and cultural discovery",
+            description: "A C1 discussion about personalised music recommendations, with nuanced opinion matching, detailed feedback and a teacher-controlled live mode.",
             path: "/ote/listening/advanced/part-3-opinion-matching#teacher-listening-tasks",
             icon: Headphones,
             tags: ["Advanced Listening", "Direct link", "Live lesson"],

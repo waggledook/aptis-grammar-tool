@@ -4,6 +4,7 @@ const subscriptionServicesAudioRoot =
   "/audio/ote/listening/advanced/part-3/subscription-services";
 const analogueMediaAudioRoot =
   "/audio/ote/listening/advanced/part-3/analogue-media";
+const algorithmsAudioRoot = "/audio/ote/listening/advanced/part-3/algorithms";
 
 export const advancedListeningPart3Sets = [
   {
@@ -1064,6 +1065,270 @@ export const advancedListeningPart3Sets = [
       },
       { speaker: "Woman", text: "Thank you." },
     ],
+  },
+  {
+    id: "algorithms",
+    level: "C1",
+    title: "Algorithms and cultural discovery",
+    description: "Match six nuanced opinions about personalised music recommendations to the woman, the man, or both speakers.",
+    teacherOnly: true,
+    assetsReady: true,
+    audioReady: true,
+    audioSrc: `${algorithmsAudioRoot}/algorithms.mp3`,
+    instructionAudioReady: true,
+    instructionAudioSrc: `${algorithmsAudioRoot}/question.mp3`,
+    instructions: "Listen to a music journalist and a media researcher discussing personalised music recommendations. Match the people—the woman, the man, or both—to the opinions below.",
+    preparationPrompt: "The clock shows how much time you have to look at the task.",
+    preparationSeconds: 30,
+    speakers: [
+      {
+        id: "woman",
+        label: "Woman",
+        name: "Nora Ellis"
+      },
+      {
+        id: "man",
+        label: "Man",
+        name: "Dr Samir Malik"
+      },
+      {
+        id: "both",
+        label: "Both",
+        name: "Both speakers"
+      }
+    ],
+    opinions: [
+      {
+        id: "names-and-variety",
+        text: "A list of unfamiliar performers can exaggerate the musical variety being offered.",
+        answer: "man",
+        review: {
+          explanation: "The man distinguishes unfamiliar performers from genuinely varied music: the names change while the musical territory stays much the same. The woman considers distinctive voices within a familiar style to be meaningful variety. Her opening reference to unfamiliar names introduces the topic without endorsing his judgement.",
+          evidence: [
+            {
+              speaker: "Man",
+              type: "correct",
+              quote: "Change the voices and the sleeve pictures and you've still got much the same musical territory.",
+              note: "The man argues that unfamiliar performers can conceal a narrow musical range."
+            },
+            {
+              speaker: "Woman",
+              type: "distractor",
+              quote: "I wouldn't need a playlist to cross three continents before calling it varied.",
+              note: "The woman defends variety within a familiar style rather than sharing his criticism of the list."
+            }
+          ]
+        }
+      },
+      {
+        id: "attention-at-introduction",
+        text: "Unfamiliar music is better introduced when listeners can give it their full attention.",
+        answer: "woman",
+        review: {
+          explanation: "The woman would save a new singer for an evening when she could concentrate. The man values an introduction that occurred while he was working and led to closer listening later. His later attention is an outcome of the discovery, not a condition he says should come before it.",
+          evidence: [
+            {
+              speaker: "Woman",
+              type: "correct",
+              quote: "I'd save the introduction for an evening when I could actually hear what made them worth recommending.",
+              note: "The woman prefers introducing unfamiliar music when she can give it her attention."
+            },
+            {
+              speaker: "Man",
+              type: "distractor",
+              quote: "I doubt I'd have chosen to sit down with it beforehand. Sometimes letting something in at the edges is how it gets a proper hearing later.",
+              note: "The man describes distracted listening as a useful route to discovering a singer he would not have selected for a dedicated session."
+            }
+          ]
+        }
+      },
+      {
+        id: "misleading-listening-records",
+        text: "Listening records can give a misleading picture of someone's musical preferences.",
+        answer: "both",
+        review: {
+          explanation: "Both speakers give independent examples of play counts misrepresenting preferences. The woman's account reflects her niece's repeated plays. The man's deliberately chosen night-time album looks like a favourite even though it is not among the music he cares about. Neither claims that listening data is always useless.",
+          evidence: [
+            {
+              speaker: "Woman",
+              type: "correct",
+              quote: "My account still has an enthusiasm for a singer my niece used for dance rehearsals. She played one song repeatedly. I've never chosen it myself.",
+              note: "Another person generated the plays that the service interprets as the account holder's preference."
+            },
+            {
+              speaker: "Man",
+              type: "correct",
+              quote: "It must look like a favourite. Ask me about the music I care about and it wouldn't make the list.",
+              note: "The man independently distinguishes frequent playback from personal musical attachment."
+            }
+          ]
+        }
+      },
+      {
+        id: "guided-second-listen",
+        text: "Guidance from another person can make an initially unappealing piece worth revisiting.",
+        answer: "both",
+        review: {
+          explanation: "The friend's note prompts the woman to revisit an initially unrewarding track and listen to the whole album. The critic's description leads the man back to a quartet whose opening then makes more sense. His limited enthusiasm for everyday listening does not cancel the value of that second attempt; the statement does not require the music to become a favourite.",
+          evidence: [
+            {
+              speaker: "Woman",
+              type: "correct",
+              quote: "The first track had done nothing for me. I went back to it with that in mind, and ended up listening to the whole thing.",
+              note: "Her friend's guidance changes her engagement with music she initially found unappealing."
+            },
+            {
+              speaker: "Man",
+              type: "correct",
+              quote: "I tried again, listening for that connection. By the end, the opening made rather more sense.",
+              note: "The critic's description independently makes the man's second attempt worthwhile."
+            },
+            {
+              speaker: "Man",
+              type: "distractor",
+              quote: "Still not something I'd put on every day.",
+              note: "This qualifies the extent of his enthusiasm, not whether the guidance helped him revisit the piece."
+            }
+          ]
+        }
+      },
+      {
+        id: "control-adventurousness",
+        text: "Listeners should be able to choose how far recommendations depart from their existing tastes.",
+        answer: "man",
+        review: {
+          explanation: "The man advocates an optional choice about how far recommendations move from familiar music. The woman's initial agreement concerns the burden of complicated settings, and the improvement she describes concerns interface simplicity. Even with two buttons she prefers reacting to actual music rather than choosing its adventurousness in advance. The man's willingness to retain a default does not withdraw his support for the option.",
+          evidence: [
+            {
+              speaker: "Man",
+              type: "correct",
+              quote: "A choice between staying nearby and going further would do; I don't need twenty controls.",
+              note: "The man proposes a simple way to choose the degree of musical exploration."
+            },
+            {
+              speaker: "Woman",
+              type: "distractor",
+              quote: "Yes, those endless settings pages used to be dreadful. The service I use has cleared most of that away now.",
+              note: "Her apparent agreement is about complicated settings, not the proposed control over adventurousness."
+            },
+            {
+              speaker: "Woman",
+              type: "distractor",
+              quote: "But even with two buttons, I'd be deciding what sort of discovery I wanted before I'd made it. I'd rather be offered something and react to it.",
+              note: "She still questions making the choice in advance after acknowledging that the interface has improved."
+            },
+            {
+              speaker: "Man",
+              type: "correct",
+              quote: "You could leave the choice untouched. I'd use it, particularly when a run of safe suggestions had started to feel like being stuck in the same room.",
+              note: "The man confirms that the control should be available without making it compulsory."
+            }
+          ]
+        }
+      },
+      {
+        id: "listener-priority",
+        text: "A closer match to the listener's tastes should always take precedence over promoting a new artist.",
+        answer: "woman",
+        review: {
+          explanation: "Despite professionally introducing new artists, the woman says a closer match belongs in a personal recommendation list and that an artist's need for exposure should not reverse that choice. The man explicitly accepts some weaker matches to give newcomers an audience. His exception rules out agreeing with the statement's word 'always'.",
+          evidence: [
+            {
+              speaker: "Woman",
+              type: "distractor",
+              quote: "I spend half my working life introducing people to them.",
+              note: "Her professional support for new artists does not establish her priority for a personal recommendation service."
+            },
+            {
+              speaker: "Woman",
+              type: "correct",
+              quote: "On a personal service, though, if an established artist is a closer fit, that's who belongs in the list. Someone else's need for an audience shouldn't reverse that choice.",
+              note: "The woman explicitly places matching the listener above promoting an artist when the two aims conflict."
+            },
+            {
+              speaker: "Man",
+              type: "distractor",
+              quote: "I'd reserve a few places for newcomers even when the match is weaker.",
+              note: "The man accepts a weaker match for the sake of exposure, rather than considering new artists only when they are an equally good fit."
+            }
+          ]
+        }
+      }
+    ],
+    script: [
+      {
+        speaker: "Woman",
+        text: "Welcome to Culture in the Feed. I'm music journalist Nora Ellis, with media researcher Dr Samir Malik. Samir, I've been looking through my recommended playlists. Hardly a name I recognise in some of them. Whatever else we say about these services, they do seem to get us beyond the usual suspects."
+      },
+      {
+        speaker: "Man",
+        text: "Beyond the names, certainly. The last one I checked had about twenty new performers, all doing rather similar things. Change the voices and the sleeve pictures and you've still got much the same musical territory. An impressive-looking list of discoveries, on paper."
+      },
+      {
+        speaker: "Woman",
+        text: "A different voice can transform a song, though. I wouldn't need a playlist to cross three continents before calling it varied. Some of my most interesting finds have been people doing something distinctive within a style I already know."
+      },
+      {
+        speaker: "Man",
+        text: "And would you put one of those lists on while working?"
+      },
+      {
+        speaker: "Woman",
+        text: "That's when I reach for something familiar. If I'm answering emails, a new singer could do something extraordinary and it would pass me by. I'd save the introduction for an evening when I could actually hear what made them worth recommending."
+      },
+      {
+        speaker: "Man",
+        text: "My working playlist has turned up a few surprises. One track kept catching my attention between emails; eventually I looked up the singer. I doubt I'd have chosen to sit down with it beforehand. Sometimes letting something in at the edges is how it gets a proper hearing later."
+      },
+      {
+        speaker: "Woman",
+        text: "Although the service can't know which part of that process a play represents. My account still has an enthusiasm for a singer my niece used for dance rehearsals. She played one song repeatedly. I've never chosen it myself."
+      },
+      {
+        speaker: "Man",
+        text: "There's a similar problem with the album I leave running at night. It must look like a favourite. Ask me about the music I care about and it wouldn't make the list. A completed play is a convenient thing to count."
+      },
+      {
+        speaker: "Woman",
+        text: "A friend sent me an album recently with a note about the way the bass kept interrupting the melody. The first track had done nothing for me. I went back to it with that in mind, and ended up listening to the whole thing. The playlist had offered me the same album weeks before."
+      },
+      {
+        speaker: "Man",
+        text: "I remember a critic describing a quartet I'd abandoned as a question that only gets answered in the final bars. I tried again, listening for that connection. By the end, the opening made rather more sense. Still not something I'd put on every day."
+      },
+      {
+        speaker: "Woman",
+        text: "Could services offer that sort of introduction?"
+      },
+      {
+        speaker: "Man",
+        text: "They could try. I'd also like some say in how far they take me from familiar ground. A choice between staying nearby and going further would do; I don't need twenty controls."
+      },
+      {
+        speaker: "Woman",
+        text: "Yes, those endless settings pages used to be dreadful. The service I use has cleared most of that away now. But even with two buttons, I'd be deciding what sort of discovery I wanted before I'd made it. I'd rather be offered something and react to it."
+      },
+      {
+        speaker: "Man",
+        text: "You could leave the choice untouched. I'd use it, particularly when a run of safe suggestions had started to feel like being stuck in the same room."
+      },
+      {
+        speaker: "Woman",
+        text: "And somewhere outside that room there's a new artist hoping to get in. I spend half my working life introducing people to them. On a personal service, though, if an established artist is a closer fit, that's who belongs in the list. Someone else's need for an audience shouldn't reverse that choice."
+      },
+      {
+        speaker: "Man",
+        text: "The established artist will win most comparisons like that. I'd reserve a few places for newcomers even when the match is weaker. Otherwise their lack of listeners becomes the reason they never get any."
+      },
+      {
+        speaker: "Woman",
+        text: "That's where we'll have to leave it. Samir, thank you."
+      },
+      {
+        speaker: "Man",
+        text: "Thank you."
+      }
+    ]
   },
 ];
 

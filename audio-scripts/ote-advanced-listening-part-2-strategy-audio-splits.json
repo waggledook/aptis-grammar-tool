@@ -1,0 +1,130 @@
+{
+  "sourceFilename": "gapped-sentence-extracts.mp3",
+  "sourceSha256": "831a14b456e615477e9bb19c10614e4171e23699b7c2947af36f17134c8b6297",
+  "sourceDurationSeconds": 262.355646,
+  "method": "MP3 stream copy; no re-encoding",
+  "silenceThresholdDb": -50,
+  "minimumSilenceSeconds": 2,
+  "leadingPaddingSeconds": 0.25,
+  "trailingPaddingSeconds": 0.35,
+  "separatorPauses": [
+    {
+      "start": 24.299977,
+      "end": 27.962063
+    },
+    {
+      "start": 57.562857,
+      "end": 61.331066
+    },
+    {
+      "start": 90.615261,
+      "end": 94.422993
+    },
+    {
+      "start": 123.913605,
+      "end": 127.577959
+    },
+    {
+      "start": 157.528798,
+      "end": 161.232585
+    },
+    {
+      "start": 188.793991,
+      "end": 192.532721
+    },
+    {
+      "start": 225.576803,
+      "end": 229.433787
+    }
+  ],
+  "clips": [
+    {
+      "file": "extract-01.mp3",
+      "title": "Designing public seating",
+      "sourceStartSeconds": 0,
+      "sourceEndSeconds": 24.649977,
+      "durationSeconds": 24.672653,
+      "sizeBytes": 593177,
+      "sha256": "1fbde7cf6054380004ae580dcf80fca146936de25ae5969ae1668c46ddac4558"
+    },
+    {
+      "file": "extract-02.mp3",
+      "title": "Organising volunteers",
+      "sourceStartSeconds": 27.712063,
+      "sourceEndSeconds": 57.912857,
+      "durationSeconds": 30.197551,
+      "sizeBytes": 725458,
+      "sha256": "6420c47aad0c956b2612a5d28a0c58c63e53c571d544758b7344717f3665d27e"
+    },
+    {
+      "file": "extract-03.mp3",
+      "title": "Access to museum tours",
+      "sourceStartSeconds": 61.081066,
+      "sourceEndSeconds": 90.965261,
+      "durationSeconds": 29.884082,
+      "sizeBytes": 717936,
+      "sha256": "2772a9d9e21a8dd1061e2a236efdc4b6714c5b479a6ad2b7b1d96d255f7631df"
+    },
+    {
+      "file": "extract-04.mp3",
+      "title": "Participation in evening classes",
+      "sourceStartSeconds": 94.172993,
+      "sourceEndSeconds": 124.263605,
+      "durationSeconds": 30.066939,
+      "sizeBytes": 722334,
+      "sha256": "51e51bac16861a8f96ad5cd6c52116f0de75b0d21a9455d49ff4713209030f7b"
+    },
+    {
+      "file": "extract-05.mp3",
+      "title": "Improving a study centre",
+      "sourceStartSeconds": 127.327959,
+      "sourceEndSeconds": 157.878798,
+      "durationSeconds": 30.537143,
+      "sizeBytes": 733611,
+      "sha256": "36616d703fef86fbf3b9a8d1cf332d8a57993b1ac8054587ff5da204fcc303a9"
+    },
+    {
+      "file": "extract-06.mp3",
+      "title": "A neighbourhood equipment scheme",
+      "sourceStartSeconds": 160.982585,
+      "sourceEndSeconds": 189.143991,
+      "durationSeconds": 28.16,
+      "sizeBytes": 676568,
+      "sha256": "eaa6331304ca725096e89bfcb40c60e63e49f2e7e0fb6ed1a4d17dda96f9b019"
+    },
+    {
+      "file": "extract-07.mp3",
+      "title": "Planning sheltered seating",
+      "sourceFilename": "ElevenLabs_2026-11-11T16_25_52_Bren - Calm Irish Conversational Voice_pvc_s50_sim75_v4.mp3",
+      "sourceSha256": "a9be75b0a48c03a31adddb971e69fbeddde402282bc4f6e4bfc78d5bd50dc2db",
+      "sourceStartSeconds": 0,
+      "sourceEndSeconds": 33.071,
+      "durationSeconds": 33.071,
+      "sizeBytes": 546073,
+      "sha256": "a9be75b0a48c03a31adddb971e69fbeddde402282bc4f6e4bfc78d5bd50dc2db",
+      "method": "Direct copy of the revised individual recording; no re-encoding or trimming",
+      "revision": 2,
+      "supersedes": {
+        "file": "extract-07.mp3",
+        "title": "Planning sheltered seating",
+        "sourceStartSeconds": 192.282721,
+        "sourceEndSeconds": 225.926803,
+        "durationSeconds": 33.645714,
+        "sizeBytes": 808219,
+        "sha256": "e36df28288808f4b46113b5cb50039e149cebf4551d4aa6266fd6e13ea201a89",
+        "sourceFilename": "gapped-sentence-extracts.mp3",
+        "sourceSha256": "831a14b456e615477e9bb19c10614e4171e23699b7c2947af36f17134c8b6297"
+      }
+    },
+    {
+      "file": "extract-08.mp3",
+      "title": "Researching a night bus service",
+      "sourceStartSeconds": 229.183787,
+      "sourceEndSeconds": 262.355646,
+      "durationSeconds": 33.063333,
+      "sizeBytes": 796940,
+      "sha256": "e05b9d5cc3956c0d4837f1102ceb015966a53aabd0c11cf22b3ef3fc4b1503cf"
+    }
+  ],
+  "firstClipPreservesOriginalStart": true
+}

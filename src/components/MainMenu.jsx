@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Seo from "./common/Seo.jsx"; // adjust path if your folder structure differs
 import AptisDemoBadge from "./access/AptisDemoBadge.jsx";
+import AptisActivitySuggestions from "./AptisActivitySuggestions.jsx";
 
 
 export default function MainMenu({ user, aptisAccess, onSignIn }) {
@@ -28,14 +29,6 @@ export default function MainMenu({ user, aptisAccess, onSignIn }) {
         {kind === "demo" ? "Demo available" : "Full access"}
       </span>
     );
-  }
-
-  function openListeningMock() {
-    if (!user) {
-      onSignIn?.();
-      return;
-    }
-    navigate(isDemoMode ? "/aptis-access" : "/listening/mock-tests");
   }
 
   const lockedLabels = {
@@ -67,23 +60,11 @@ export default function MainMenu({ user, aptisAccess, onSignIn }) {
 
       <AptisDemoBadge user={user} aptisAccess={aptisAccess} onSignIn={onSignIn} />
 
-      <div className="whats-new-banner">
-        <div className="whats-new-copy">
-          <span className="whats-new-label">What’s new</span>
-          <h3>New Aptis Listening Mock Exam</h3>
-          <p>
-            Take a complete 17-question, 40-minute listening test covering all four parts.
-            Afterwards, review every answer with replayable audio, highlighted transcripts and clear explanations.
-          </p>
-        </div>
-
-        <button
-          className="whats-new-btn"
-          onClick={openListeningMock}
-        >
-          {isDemoMode ? (user ? "View access options" : "Sign in to unlock") : "Start Listening Mock 1"}
-        </button>
-      </div>
+      <AptisActivitySuggestions
+        key={`${user?.uid || "guest"}:${isDemoMode}`}
+        userId={user?.uid || "guest"}
+        isDemoMode={isDemoMode}
+      />
 
       {isDemoMode && lockedSection && (
         <div className="menu-access-prompt" role="status">

@@ -949,6 +949,171 @@ export const advancedListeningPart2Sets = [
       "Recognise scorekeeping and time limits as examples of pressure."
     ]
   },
+  {
+    id: "theme-parks",
+    level: "C1",
+    title: "How Theme Parks Turn Waiting into Part of the Attraction",
+    description: "Complete six gaps in a set of lecture notes with words from the recording.",
+    teacherOnly: true,
+    assetsReady: true,
+    audioReady: true,
+    audioSrc: "/audio/ote/listening/advanced/part-2/theme-parks/theme-parks.mp3",
+    instructionAudioReady: true,
+    instructionAudioSrc: "/audio/ote/listening/advanced/part-2/theme-parks/question.mp3",
+    instructions: "Listen to a lecture about theme park queue design. Complete the gaps in the notes with a word or two-word phrase from the audio. Remember to check your spelling.",
+    preparationPrompt: "The clock shows how much time you have to look at the task.",
+    preparationSeconds: 30,
+    gaps: [
+      {
+        id: "staged-revelations",
+        answer: "corners",
+        section: "Revealing the setting",
+        before: "Designers can use",
+        after: "to reveal scenes in stages.",
+        review: {
+          explanation: "Corners allow visitors to discover the setting through successive views, whereas a straight passage reveals its contents immediately.",
+          correctQuote: "corners",
+          distractors: [
+            {
+              quote: "A straight passage",
+              note: "This reveals its contents immediately rather than showing scenes in stages."
+            }
+          ]
+        }
+      },
+      {
+        id: "workshop-details",
+        answer: "background details",
+        section: "Revealing the setting",
+        before: "A workshop's",
+        after: "can communicate information without a formal explanation.",
+        review: {
+          explanation: "Objects in the workshop suggest its history without a long announcement. The case and inventions are examples of these background details.",
+          correctQuote: "Background details",
+          distractors: [
+            {
+              quote: "a long announcement",
+              note: "The workshop can communicate its history without this formal explanation."
+            },
+            {
+              quote: "Spoken dialogue",
+              note: "Dialogue can add information, but visitors may miss its beginning; the note asks about the details in the workshop."
+            }
+          ]
+        },
+        acceptedAnswers: [
+          "details"
+        ]
+      },
+      {
+        id: "outdoor-comfort",
+        answer: "shade",
+        section: "Making the route comfortable",
+        before: "An outdoor route may need",
+        after: "more urgently than additional entertainment.",
+        review: {
+          explanation: "The covered walkway offers relief from the sun. In the illustrative design choice, this can be more valuable than another animated figure.",
+          correctQuote: "Shade",
+          distractors: [
+            {
+              quote: "another animated figure",
+              note: "This provides entertainment, while the note asks about physical comfort outdoors."
+            }
+          ]
+        }
+      },
+      {
+        id: "repeated-effects",
+        answer: "repetition",
+        section: "Maintaining interest",
+        before: "Designers must consider the effect of",
+        after: "during longer waits.",
+        review: {
+          explanation: "Visitors may hear the same talking portrait repeatedly during a slow queue. This makes repetition important to test, alongside volume and visibility.",
+          correctQuote: "Repetition",
+          distractors: [
+            {
+              quote: "volume and visibility",
+              note: "These are other testing considerations; the clue about longer waits selects the repeated effect."
+            }
+          ]
+        }
+      },
+      {
+        id: "boarding-location",
+        answer: "loading area",
+        section: "Preparing for the ride",
+        before: "Information near the",
+        after: "can help groups board efficiently.",
+        review: {
+          explanation: "Instructions near the loading area explain where to stand, how groups will be seated and when to move, preventing hesitation as a vehicle arrives.",
+          correctQuote: "loading area",
+          distractors: [
+            {
+              quote: "A beautifully staged final scene",
+              note: "The scene is of limited value if it prevents visitors hearing the practical boarding directions."
+            }
+          ]
+        }
+      },
+      {
+        id: "visitor-expectations",
+        answer: "expectations",
+        section: "Preparing for the ride",
+        before: "The queue helps shape visitors'",
+        after: "about the experience ahead.",
+        review: {
+          explanation: "Playful and tense introductions prepare visitors differently for the ride. Expectations names what these introductions shape.",
+          correctQuote: "expectations",
+          distractors: [
+            {
+              quote: "a tense sequence",
+              note: "This is one possible mood for the introduction, rather than what the queue shapes for visitors."
+            }
+          ]
+        }
+      }
+    ],
+    supportingNotes: [],
+    script: [
+      {
+        speaker: "Lecturer",
+        text: "When does a theme park attraction begin? You might say it starts when the vehicle moves. A designer may give a different answer: the experience can begin as soon as visitors leave the main path and join the queue. Waiting remains waiting, of course. A decorated corridor does not increase the number of seats on a ride. Nevertheless, the route can introduce a setting, prepare people for what follows and give them something worth noticing along the way."
+      },
+      {
+        speaker: "Lecturer",
+        text: "One useful design question concerns how much visitors can see at once. A straight passage presents its contents immediately, whereas corners allow a setting to appear in stages. Imagine approaching a fictional explorer's workshop. A glimpse of a damaged machine could be followed by a room showing the tools used to repair it. Each new view develops the situation. This is different from simply concealing how far the queue extends: the sequence needs to remain interesting once someone reaches the next section."
+      },
+      {
+        speaker: "Lecturer",
+        text: "The workshop need not explain its history through a long announcement. Background details can suggest who works there and what has recently happened. A half-packed case might imply a hurried departure; a collection of unfinished inventions could suggest repeated failure. Visitors can interpret these clues while moving. Spoken dialogue may add another layer, but it should not carry every essential point, since someone arriving halfway through a recording will have missed its beginning."
+      },
+      {
+        speaker: "Lecturer",
+        text: "Physical comfort still matters. In a hypothetical outdoor section, designers might be deciding between another animated figure and a covered walkway. Shade could be the more valuable addition on a hot afternoon. Visitors who are concentrating on finding relief from the sun may pay little attention to an elaborate scene. Seating where appropriate, space for groups and a clear route also influence whether people can enjoy what has been created around them."
+      },
+      {
+        speaker: "Lecturer",
+        text: "An effect that works beautifully on a brief walkthrough may become irritating during a slow queue. A talking portrait could deliver its joke just as a group passes, or the same group could hear it six times. Repetition is therefore something designers need to test, alongside volume and visibility. A short story with a fixed sequence also creates difficulties if visitors move out of the room before its ending. Some details can instead be discovered independently, in any order."
+      },
+      {
+        speaker: "Lecturer",
+        text: "The approach to the loading area has a different purpose. Here, visitors need to understand where to stand, how their group will be seated and when to move. Instructions delivered at this point can prevent hesitation when a vehicle arrives. Complicated storytelling should leave room for this practical information. A beautifully staged final scene is of limited value if it prevents people hearing the boarding directions."
+      },
+      {
+        speaker: "Lecturer",
+        text: "Ultimately, the queue shapes expectations. A playful introduction prepares visitors differently from a tense sequence suggesting that something has gone wrong. Neither approach is automatically better; what matters is its relationship to the ride that follows. The design succeeds when the experience feels connected, rather than when the waiting space merely contains the greatest number of effects."
+      }
+    ],
+    itemDesign: [
+      "Distinguish staged views from a passage revealing its contents immediately.",
+      "Connect objects in a setting with the history they communicate.",
+      "Separate outdoor comfort from additional entertainment.",
+      "Relate repeated effects to longer waits rather than volume or visibility.",
+      "Identify the location where practical information supports efficient boarding.",
+      "Recognise playful and tense introductions as ways of shaping expectations."
+    ]
+  },
 ];
 
 export function getAdvancedListeningPart2Set(setId) {

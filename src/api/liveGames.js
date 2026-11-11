@@ -50,6 +50,7 @@ import {
   COHESION_CHALLENGE_TASK_ID,
 } from "../products/ote/data/oteAdvancedReadingCohesionChallenge.js";
 import { OTE_LISTENING_LIVE_GAME_TYPE } from "../products/ote/data/oteListeningLive.js";
+import { LISTENING_STRATEGY_GAME_TYPE } from "../products/ote/data/oteListeningPart2Strategy.js";
 import {
   getOteAdvancedReadingPart2TeacherTask,
   OTE_ADVANCED_READING_PART2_LIVE_GAME_TYPE,
@@ -724,6 +725,7 @@ export async function joinLiveGameByPin(pin) {
     game.type === OPTION_JURY_GAME_TYPE ||
     game.type === PART4_EVIDENCE_LIVE_GAME_TYPE ||
     game.type === OTE_LISTENING_LIVE_GAME_TYPE ||
+    game.type === LISTENING_STRATEGY_GAME_TYPE ||
     game.type === APTIS_LISTENING_PART2_LIVE_GAME_TYPE ||
     game.type === APTIS_LISTENING_PART3_LIVE_GAME_TYPE ||
     game.type === APTIS_LISTENING_PART4_LIVE_GAME_TYPE ||
