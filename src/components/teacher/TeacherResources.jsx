@@ -124,6 +124,13 @@ const PRODUCT_GROUPS = [
             tags: ["Direct link", "Opinion matching", "Live lesson"],
           },
           {
+            title: "Listening Part 3 · Children's Independence",
+            description: "Two-parent opinion-matching task with narrated instructions, a full dialogue and question-by-question live review.",
+            path: "/listening/part3-teacher/childrens-independence",
+            icon: Headphones,
+            tags: ["Direct link", "Opinion matching", "Live lesson"],
+          },
+          {
             title: "Listening Part 4 · Cashless Venues and Museum Replicas",
             description: "Two double multiple-choice tasks with answer feedback, evidence-led transcripts and teacher-controlled review.",
             path: "/listening/part4-teacher/cashless-venues",

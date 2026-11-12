@@ -13,6 +13,124 @@ import { TEACHER_LISTENING_PART3_TASKS } from "./teacherListeningPart3Data.js";
 // ─────────────────────────────────────────────────────────────────────────────
 const PART3_LISTENING_TASKS = [
   {
+    id: "exercise-classes",
+    title: "Exercise Classes",
+    intro:
+      "Listen to a man and a woman discussing exercise classes and exercising independently. Read the statements (a–d) and decide who expresses each opinion — the man, the woman, or both. You can listen to the discussion twice.",
+    audioSrc: "/audio/listening/part3/exercise-classes.mp3",
+    statements: [
+      {
+        key: "a",
+        text: "A fixed timetable helps people exercise regularly.",
+        answer: "woman",
+        scriptLineIndex: 2,
+        evidenceParts: [
+          "everything else has to fit around it",
+          "Since I stopped booking classes, I actually get out more often",
+        ],
+        explanation:
+          "The woman protects Tuesday in her diary so that other demands fit around exercise. The man's late work used to make him miss classes; running at a time he can change lets him exercise more often. His later interest in a running partner concerns company, rather than a fixed timetable.",
+      },
+      {
+        key: "b",
+        text: "Exercising with others can encourage excessive effort.",
+        answer: "both",
+        scriptLineIndex: 3,
+        evidenceParts: [
+          "reach for the same weights",
+          "getting a cup off the shelf was an achievement",
+          "wait for someone else to stop first",
+          "A couple of very uncomfortable mornings cured me of that",
+        ],
+        explanation:
+          "The man copies another participant's weights despite the instructor not asking him to, then struggles with an ordinary movement the following morning. The woman delays taking the easier option until somebody else stops, and describes the painful results. Both imply that other participants influenced them to exceed their own limits.",
+      },
+      {
+        key: "c",
+        text: "Beginners need individual feedback even on simple exercises.",
+        answer: "man",
+        scriptLineIndex: 5,
+        evidenceParts: [
+          "needs another pair of eyes",
+          "even for movements that look straightforward",
+          "it got me started perfectly well",
+          "I'd save the individual attention for something more complicated",
+        ],
+        explanation:
+          "The man's 'another pair of eyes' means somebody observing and correcting the beginner; he includes straightforward movements. The woman describes getting started successfully using the class demonstration alone and reserves individual attention for more complicated exercise. Her acceptance of close supervision for serious weights does not extend to the simple exercises specified in the statement.",
+      },
+      {
+        key: "d",
+        text: "The social side helps people maintain an exercise habit.",
+        answer: "both",
+        scriptLineIndex: 7,
+        evidenceParts: [
+          "our running club moved its post-run coffee to another evening",
+          "Nothing about the runs changed, but I gradually stopped turning up",
+          "remembered I'd promised to hear how one woman's job interview had gone",
+          "My kit came out after all",
+        ],
+        explanation:
+          "The man's attendance declined when coffee was separated from the runs, although the runs themselves were unchanged. This implies that the social occasion had helped sustain his exercise. The woman goes despite nearly cancelling because she wants to hear about another participant's interview. Her growing social connection also helps her continue attending.",
+      },
+    ],
+    script: [
+      {
+        speaker: "Woman",
+        text:
+          "I've finally found an exercise class I actually attend. Tuesday evenings, straight after work. My kit comes to the office with me now. At home there's always a cupboard to tidy or a message to answer, and by the time I've dealt with those, somehow it's bedtime.",
+      },
+      {
+        speaker: "Man",
+        text:
+          "I used to watch the clock at work and realise I'd already missed the warm-up. These days a late meeting means a later run. Since I stopped booking classes, I actually get out more often.",
+      },
+      {
+        speaker: "Woman",
+        text:
+          "An empty space in my diary wouldn't stay empty for long. Once Tuesday's written in, everything else has to fit around it.",
+      },
+      {
+        speaker: "Man",
+        text:
+          "The class wasn't really bringing out my sensible side, either. I'd notice what the person beside me was lifting and reach for the same weights. The instructor never asked me to. Next morning, getting a cup off the shelf was an achievement.",
+      },
+      {
+        speaker: "Woman",
+        text:
+          "Our instructor keeps offering an easier version. It's surprising how difficult that is to choose when everyone around you is still carrying on. I used to wait for someone else to stop first. A couple of very uncomfortable mornings cured me of that.",
+      },
+      {
+        speaker: "Man",
+        text:
+          "A demonstration can look perfectly clear from the back of a room. It's when you try it yourself that you discover what you haven't understood. Somebody starting out needs another pair of eyes, even for movements that look straightforward.",
+      },
+      {
+        speaker: "Woman",
+        text:
+          "I'd want someone watching closely if I started lifting serious weights. Our instructor breaks the basic movements down and shows the common mistakes. In my first few weeks, that was all I had to go on, and it got me started perfectly well. I'd save the individual attention for something more complicated.",
+      },
+      {
+        speaker: "Man",
+        text:
+          "Years ago, our running club moved its post-run coffee to another evening. Nothing about the runs changed, but I gradually stopped turning up. I hadn't realised which bit I'd been making the effort for.",
+      },
+      {
+        speaker: "Woman",
+        text:
+          "We get a drink afterwards. Last week I nearly stayed at home, then remembered I'd promised to hear how one woman's job interview had gone. My kit came out after all. Lately, Tuesday's become the evening when I catch up with people.",
+      },
+      {
+        speaker: "Man",
+        text: "Perhaps I need a running partner with equally unpredictable working hours.",
+      },
+      {
+        speaker: "Woman",
+        text: "As long as your coffee break comes after the run.",
+      },
+    ],
+  },
+  {
     id: "subscriptions",
     title: "Subscriptions",
     intro:

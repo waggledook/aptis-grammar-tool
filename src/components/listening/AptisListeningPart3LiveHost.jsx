@@ -87,7 +87,7 @@ export default function AptisListeningPart3LiveHost({ user }) {
       const sources = kind === "first"
         ? [task.audioSrc]
         : kind === "full"
-          ? [LISTEN_AGAIN_PROMPT_SRC, task.audioSrc]
+          ? [LISTEN_AGAIN_PROMPT_SRC, task.dialogueAudioSrc || task.audioSrc]
           : reviewIndex === 0
             ? [LISTEN_AGAIN_PROMPT_SRC, task.sectionAudio[reviewIndex]]
             : [task.sectionAudio[reviewIndex]];

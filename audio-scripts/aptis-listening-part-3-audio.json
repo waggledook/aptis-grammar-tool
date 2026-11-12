@@ -1,0 +1,95 @@
+{
+  "format": {
+    "sampleRate": 44100,
+    "channels": 1,
+    "bitrateKbps": 192
+  },
+  "assembledRecordings": [
+    {
+      "instructionsFilename": "exercise-classes-instructions.mp3",
+      "instructionsSha256": "71d2e0266853296b8c3f5c5fb6249b1148a1f5331f89c8ddfd87d09807e0591d",
+      "dialogueFilename": "ElevenLabs_Untitled_project (4).mp3",
+      "dialogueSha256": "ed64939528c8f794f24541c84aed0f8c0fef984033737a74f12c881224b935e2",
+      "pauseSeconds": 3,
+      "output": "public/audio/listening/part3/exercise-classes.mp3",
+      "durationSeconds": 156.710454,
+      "sha256": "1fd759d3bb50071098567d59c6a05969a2cd17d2b3d9f0c77095b88ba104c556"
+    },
+    {
+      "instructionsFilename": "childrens-independence-instructions.mp3",
+      "instructionsSha256": "09b815dc5c3623569742f550bcac1ae6ddcbb7c0e4578f6a143409a0ab551ab4",
+      "dialogueFilename": "childrens-independence-dialogue.mp3",
+      "dialogueSha256": "0967088b9fbbda77deb33785a0ef23876d03da7cd709b77fa9215522e73bf780",
+      "pauseSeconds": 3,
+      "output": "public/audio/listening/part3/teacher/childrens-independence.mp3",
+      "durationSeconds": 149.242109,
+      "sha256": "8c786812e877a66fe4b04ef663bc023bf8df35a4eb717fdb6e36866da5fd069a"
+    }
+  ],
+  "parentingSections": {
+    "sourceFilename": "childrens-independence-dialogue.mp3",
+    "sourceSha256": "0967088b9fbbda77deb33785a0ef23876d03da7cd709b77fa9215522e73bf780",
+    "sourceDurationSeconds": 131.012721,
+    "method": "Split at the midpoints of silence between topic exchanges; re-encoded at 192 kbps.",
+    "separatorPauses": [
+      {
+        "start": 35.93,
+        "end": 36.867528
+      },
+      {
+        "start": 68.809683,
+        "end": 69.633878
+      },
+      {
+        "start": 96.915329,
+        "end": 97.573424
+      }
+    ],
+    "clips": [
+      {
+        "file": "childrens-independence-section-1.mp3",
+        "scriptRange": [
+          0,
+          3
+        ],
+        "sourceStartSeconds": 0,
+        "sourceEndSeconds": 36.398764,
+        "durationSeconds": 36.398753,
+        "sha256": "7b0419ce5e76f8c088a34df93eebc10a2091babe7a9fb4915af639e171bb6ff7"
+      },
+      {
+        "file": "childrens-independence-section-2.mp3",
+        "scriptRange": [
+          3,
+          6
+        ],
+        "sourceStartSeconds": 36.398764,
+        "sourceEndSeconds": 69.221781,
+        "durationSeconds": 32.823016,
+        "sha256": "170d85d5276d0511413d0b319a32f52f8c90afd84577cca3959a2b81d37dc93f"
+      },
+      {
+        "file": "childrens-independence-section-3.mp3",
+        "scriptRange": [
+          6,
+          8
+        ],
+        "sourceStartSeconds": 69.221781,
+        "sourceEndSeconds": 97.244377,
+        "durationSeconds": 28.022585,
+        "sha256": "a5b0e9abe33119337841dda324b2d3ffcbd49b1345fc36bba19da8066984faf3"
+      },
+      {
+        "file": "childrens-independence-section-4.mp3",
+        "scriptRange": [
+          8,
+          12
+        ],
+        "sourceStartSeconds": 97.244377,
+        "sourceEndSeconds": 131.012721,
+        "durationSeconds": 33.768345,
+        "sha256": "7ac03805309e36332db8400cc622a38a66d3e946211963cb3815875636fd7615"
+      }
+    ]
+  }
+}
