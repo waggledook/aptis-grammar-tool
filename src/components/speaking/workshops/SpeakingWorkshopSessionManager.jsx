@@ -9,6 +9,7 @@ import {
   MessageSquareText,
   Play,
   Plus,
+  RotateCcw,
   Square,
   Trash2,
   UserPlus,
@@ -33,6 +34,14 @@ import {
 } from "./workshopSchedule";
 
 const WORKSHOP_TIME_ZONE = "Europe/Madrid";
+const WORKSHOP_ACTION_LABELS = {
+  create: "Created",
+  start: "Started",
+  end: "Ended and opened review",
+  restore: "Restored",
+  review_period_corrected: "Extended review to four weeks",
+  delete_requested: "Requested deletion",
+};
 
 function capitalize(value = "") {
   return value ? `${value.charAt(0).toUpperCase()}${value.slice(1)}` : "";
@@ -217,15 +226,27 @@ export default function SpeakingWorkshopSessionManager({ user }) {
     }
   }
 
-  async function updateSession(sessionId, action) {
-    if (updatingId || deletingId) return;
-    setUpdatingId(sessionId);
+  async function updateSession(session, action) {
+    if (updatingId || deletingId || addingMemberId) return;
+    const startsAt = new Date(session.startsAt || 0);
+    let confirmation = "";
+    if (action === "end") {
+      confirmation = `End “${session.label}” now? Registration will close and the four-week review period will begin.`;
+    } else if (action === "restore") {
+      const nextStage = startsAt > new Date()
+        ? `preparation until ${formatSessionStart(session.startsAt)}` : "live practice";
+      confirmation = `Restore “${session.label}”? Registration will reopen with the same join link and participants. The workshop will return to ${nextStage}.`;
+    } else if (action === "start" && startsAt > new Date()) {
+      confirmation = `Start “${session.label}” early? It is scheduled for ${formatSessionStart(session.startsAt)}. Practice will unlock immediately.`;
+    }
+    if (confirmation && !window.confirm(confirmation)) return;
+    setUpdatingId(session.id);
     setError("");
     try {
-      const result = await updateSpeakingWorkshopSession(sessionId, action);
+      const result = await updateSpeakingWorkshopSession(session.id, action);
       if (result?.session) {
         setSessions((current) => current.map((session) => (
-          session.id === sessionId ? { ...session, ...result.session } : session
+          session.id === result.session.id ? { ...session, ...result.session } : session
         )));
       }
     } catch (requestError) {
@@ -386,6 +407,8 @@ export default function SpeakingWorkshopSessionManager({ user }) {
     const invitationCopyKey = `${session.id}:invitation`;
     const memberSearch = memberSearches[session.id] || { status: "idle", students: [] };
     const memberSearchListId = `workshop-member-results-${session.id}`;
+    const actionHistory = session.actionHistory?.length ? session.actionHistory
+      : session.lastAction ? [session.lastAction] : [];
 
     return (
       <article className={`workshop-session-card is-${session.phase}`} key={session.id}>
@@ -400,6 +423,19 @@ export default function SpeakingWorkshopSessionManager({ user }) {
             </span>
           ) : null}
           <span className="workshop-attendee-count"><Users size={17} /> {session.attendeeCount} registered</span>
+          {actionHistory.length ? (
+            <details className="workshop-action-history">
+              <summary>Change history</summary>
+              <ol>
+                {actionHistory.map((entry, index) => (
+                  <li key={entry.id || index}>
+                    <strong>{WORKSHOP_ACTION_LABELS[entry.action] || entry.action}</strong>
+                    <span>{entry.actorRole === "system" ? "System" : entry.actorEmail || entry.actorUid || "Unknown account"} · {formatDate(entry.at)}</span>
+                  </li>
+                ))}
+              </ol>
+            </details>
+          ) : null}
           {session.attendees?.length ? (
             <details className="workshop-attendee-list">
               <summary>View participants</summary>
@@ -513,13 +549,19 @@ export default function SpeakingWorkshopSessionManager({ user }) {
         {session.phase !== "review" || user?.role === "admin" ? (
           <div className="workshop-session-actions">
             {session.phase === "preparation" ? (
-              <button type="button" disabled={updatingId === session.id || deletingId === session.id} onClick={() => updateSession(session.id, "start")}>
+              <button type="button" disabled={Boolean(updatingId || deletingId || addingMemberId)} onClick={() => updateSession(session, "start")}>
                 <Play size={17} /> Start now
               </button>
             ) : null}
             {session.phase === "live" ? (
-              <button className="is-end" type="button" disabled={updatingId === session.id || deletingId === session.id} onClick={() => updateSession(session.id, "end")}>
+              <button className="is-end" type="button" disabled={Boolean(updatingId || deletingId || addingMemberId)} onClick={() => updateSession(session, "end")}>
                 <Square size={16} /> End & start review
+              </button>
+            ) : null}
+            {isReviewSession && user?.role === "admin" ? (
+              <button type="button" disabled={Boolean(updatingId || deletingId || addingMemberId)} onClick={() => updateSession(session, "restore")}>
+                {updatingId === session.id ? <LoaderCircle className="workshop-spin" size={16} /> : <RotateCcw size={16} />}
+                {updatingId === session.id ? "Restoring…" : "Restore workshop"}
               </button>
             ) : null}
             {user?.role === "admin" ? (

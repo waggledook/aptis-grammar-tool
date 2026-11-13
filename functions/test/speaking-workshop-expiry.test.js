@@ -8,25 +8,16 @@ const {
 } = require("../index");
 const db = admin.firestore();
 const DAY_MS = 86400000;
-const sessionId = "existingWorkshop123";
+const {mockWorkshop} = require("./helpers/speaking-workshop-fixture");
 
 test.after(async () => { await admin.app().delete(); });
 
 for (const phase of ["live", "preparation"]) {
   test(`an existing ${phase} session gets 28 days from its actual end`, async (t) => {
     const startsAt = admin.firestore.Timestamp.fromMillis(Date.now() - DAY_MS);
-    const session = {phase, startsAt, topicIds: ["relationships-family"]};
-    const snap = {id: sessionId, exists: true, data: () => session};
-    const sessionRef = {get: async () => snap};
-    t.mock.method(db, "doc", () => ({get: async () => ({data: () => ({role: "teacher"})})}));
-    t.mock.method(db, "collection", () => ({doc: () => sessionRef}));
-    t.mock.method(db, "runTransaction", async (callback) => callback({
-      get: async () => snap,
-      update: (ref, value) => {
-        assert.equal(ref, sessionRef);
-        Object.assign(session, value);
-      },
-    }));
+    const {session, sessionId, audits} = mockWorkshop(t, {
+      phase, startsAt, topicIds: ["relationships-family"],
+    }, "teacher");
 
     const before = Date.now();
     const result = await updateSpeakingWorkshopSession.run({
@@ -39,12 +30,16 @@ for (const phase of ["live", "preparation"]) {
     assert.ok(session.endedAt.toMillis() <= Date.now());
     assert.equal(session.reviewUntil.toMillis() - session.endedAt.toMillis(), 28 * DAY_MS);
     assert.equal(result.session.reviewUntil, session.reviewUntil.toDate().toISOString());
+    assert.equal(audits.length, 1);
+    assert.equal(audits[0].action, "end");
+    assert.equal(audits[0].actorUid, "teacher");
 
     const savedExpiry = session.reviewUntil;
     await assert.rejects(updateSpeakingWorkshopSession.run({
       sessionId, action: "end",
     }, {auth: {uid: "teacher"}}), {code: "failed-precondition"});
     assert.equal(session.reviewUntil, savedExpiry);
+    assert.equal(audits.length, 1);
   });
 }
 

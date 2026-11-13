@@ -11,6 +11,9 @@ const {createLiveGameEmailHandler} = require("./live-game-email-handler");
 const {
   canUseRelaxedPractice,
 } = require("./speaking-workshop-access-policy");
+const {
+  SPEAKING_WORKSHOP_REVIEW_DAYS,
+} = require("./speaking-workshop-review-policy");
 
 // ---------- init Admin (safe if called twice) ----------
 try { admin.app(); } catch { admin.initializeApp(); }
@@ -32,7 +35,6 @@ const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const SPEAKING_WORKSHOP_ACCESS_CODE_HASH = String(
   process.env.SPEAKING_WORKSHOP_ACCESS_CODE_HASH || ""
 ).trim().toLowerCase();
-const SPEAKING_WORKSHOP_REVIEW_DAYS = 28;
 const SPEAKING_WORKSHOP_CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const DEFAULT_ASSESSMENT_FEEDBACK_MODEL = "gpt-5.6-luna";
 const firestore = admin.firestore();
@@ -118,6 +120,51 @@ function speakingWorkshopPhase(data = {}, now = new Date()) {
   return phase;
 }
 
+function speakingWorkshopAuditEvents(sessionId) {
+  // Keep history outside the session so deleting a workshop cannot erase it.
+  // Client access is denied by the default Firestore rules.
+  return firestore.collection("speakingWorkshopAudit").doc(sessionId)
+    .collection("events");
+}
+
+function speakingWorkshopAudit(action, context, role, session, toPhase) {
+  return {
+    action,
+    actorUid: context.auth.uid,
+    actorEmail: context.auth.token?.email || null,
+    actorRole: role,
+    at: admin.firestore.FieldValue.serverTimestamp(),
+    label: session.label || "Speaking workshop",
+    fromPhase: session.phase || null,
+    toPhase,
+    previousStartedAt: session.startedAt || null,
+    previousEndedAt: session.endedAt || null,
+    previousReviewUntil: session.reviewUntil || null,
+  };
+}
+
+function serializeSpeakingWorkshopAudit(data) {
+  if (!data) return null;
+  return {
+    action: data.action,
+    actorUid: data.actorUid,
+    actorEmail: data.actorEmail || null,
+    actorRole: data.actorRole,
+    at: speakingWorkshopDate(data.at)?.toISOString() || null,
+    fromPhase: data.fromPhase,
+    toPhase: data.toPhase,
+  };
+}
+
+async function speakingWorkshopHistory(sessionId) {
+  const events = await speakingWorkshopAuditEvents(sessionId)
+    .orderBy("at", "desc").limit(20).get();
+  return events.docs.map((snap) => ({
+    id: snap.id,
+    ...serializeSpeakingWorkshopAudit(snap.data()),
+  }));
+}
+
 function serializeSpeakingWorkshopSession(snap, includeCode = false) {
   const data = snap.data() || {};
   const result = {
@@ -134,7 +181,10 @@ function serializeSpeakingWorkshopSession(snap, includeCode = false) {
     endedAt: speakingWorkshopDate(data.endedAt)?.toISOString() || null,
     reviewUntil: speakingWorkshopDate(data.reviewUntil)?.toISOString() || null,
   };
-  if (includeCode) result.joinCode = data.joinCode || "";
+  if (includeCode) {
+    result.joinCode = data.joinCode || "";
+    result.lastAction = serializeSpeakingWorkshopAudit(data.lastAction);
+  }
   return result;
 }
 
@@ -214,7 +264,7 @@ exports.createSpeakingWorkshopSession = functions
   .runWith({maxInstances: 10})
   .region("europe-west1")
   .https.onCall(async (data, context) => {
-    await requireSpeakingWorkshopStaff(context);
+    const role = await requireSpeakingWorkshopStaff(context);
     const label = String(data?.label || "Speaking workshop").trim().slice(0, 80);
     const topicIds = [...new Set(
       (Array.isArray(data?.topicIds) ? data.topicIds : [])
@@ -255,7 +305,11 @@ exports.createSpeakingWorkshopSession = functions
     }
 
     const sessionRef = firestore.collection("speakingWorkshopSessions").doc();
-    await sessionRef.set({
+    const audit = speakingWorkshopAudit(
+      "create", context, role, {label}, "preparation"
+    );
+    const batch = firestore.batch();
+    batch.set(sessionRef, {
       label: label || "Speaking workshop",
       topicIds,
       phase: "preparation",
@@ -271,7 +325,10 @@ exports.createSpeakingWorkshopSession = functions
       createdByEmail: context.auth.token?.email || null,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      lastAction: audit,
     });
+    batch.set(speakingWorkshopAuditEvents(sessionRef.id).doc(), audit);
+    await batch.commit();
     const created = await sessionRef.get();
     return {ok: true, session: serializeSpeakingWorkshopSession(created, true)};
   });
@@ -285,12 +342,16 @@ exports.listSpeakingWorkshopSessions = functions
       .orderBy("createdAt", "desc")
       .limit(30)
       .get();
-    const attendeeSnaps = await Promise.all(sessions.docs.map((snap) => (
-      snap.ref.collection("attendees").orderBy("joinedAt", "asc").limit(100).get()
-    )));
+    const [attendeeSnaps, histories] = await Promise.all([
+      Promise.all(sessions.docs.map((snap) => (
+        snap.ref.collection("attendees").orderBy("joinedAt", "asc").limit(100).get()
+      ))),
+      Promise.all(sessions.docs.map((snap) => speakingWorkshopHistory(snap.id))),
+    ]);
     return {
       sessions: sessions.docs.map((snap, index) => ({
         ...serializeSpeakingWorkshopSession(snap, true),
+        actionHistory: histories[index],
         attendees: attendeeSnaps[index].docs.map((attendeeSnap) => {
           const attendee = attendeeSnap.data() || {};
           return {
@@ -662,24 +723,56 @@ exports.updateSpeakingWorkshopSession = functions
   .runWith({maxInstances: 10})
   .region("europe-west1")
   .https.onCall(async (data, context) => {
-    await requireSpeakingWorkshopStaff(context);
+    const role = await requireSpeakingWorkshopStaff(context);
     const sessionId = String(data?.sessionId || "").trim();
     const action = String(data?.action || "").trim().toLowerCase();
     if (!/^[A-Za-z0-9]{10,40}$/.test(sessionId) ||
-        !["start", "end"].includes(action)) {
+        !["start", "end", "restore"].includes(action)) {
       throw new functions.https.HttpsError(
         "invalid-argument",
         "Choose a valid workshop session and action."
       );
     }
+    if (action === "restore" && role !== "admin") {
+      throw new functions.https.HttpsError(
+        "permission-denied",
+        "Only administrators can restore speaking workshops."
+      );
+    }
     const sessionRef = firestore.collection("speakingWorkshopSessions")
       .doc(sessionId);
+    const auditRef = speakingWorkshopAuditEvents(sessionId).doc();
     await firestore.runTransaction(async (transaction) => {
       const snap = await transaction.get(sessionRef);
       if (!snap.exists) {
         throw new functions.https.HttpsError("not-found", "Workshop not found.");
       }
       const session = snap.data() || {};
+      if (action === "restore") {
+        if (session.phase !== "review") {
+          throw new functions.https.HttpsError(
+            "failed-precondition",
+            "Only an ended workshop can be restored."
+          );
+        }
+        const startsAt = speakingWorkshopDate(session.startsAt);
+        const phase = startsAt && startsAt > new Date() ? "preparation" : "live";
+        const audit = speakingWorkshopAudit(action, context, role, session, phase);
+        transaction.update(sessionRef, {
+          phase,
+          registrationOpen: true,
+          startedAt: phase === "preparation"
+            ? admin.firestore.FieldValue.delete()
+            : session.startedAt || session.startsAt ||
+              admin.firestore.FieldValue.serverTimestamp(),
+          endedAt: admin.firestore.FieldValue.delete(),
+          reviewUntil: admin.firestore.FieldValue.delete(),
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          lastAction: audit,
+        });
+        transaction.set(auditRef, audit);
+        return;
+      }
       if (action === "start") {
         if (session.phase !== "preparation") {
           throw new functions.https.HttpsError(
@@ -687,11 +780,14 @@ exports.updateSpeakingWorkshopSession = functions
             "Only a preparation-stage workshop can be started."
           );
         }
+        const audit = speakingWorkshopAudit(action, context, role, session, "live");
         transaction.update(sessionRef, {
           phase: "live",
           startedAt: admin.firestore.FieldValue.serverTimestamp(),
           updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          lastAction: audit,
         });
+        transaction.set(auditRef, audit);
         return;
       }
       if (speakingWorkshopPhase(session) !== "live") {
@@ -704,6 +800,7 @@ exports.updateSpeakingWorkshopSession = functions
       const reviewUntil = new Date(
         endedAt.getTime() + SPEAKING_WORKSHOP_REVIEW_DAYS * 86400000
       );
+      const audit = speakingWorkshopAudit(action, context, role, session, "review");
       transaction.update(sessionRef, {
         phase: "review",
         registrationOpen: false,
@@ -712,10 +809,15 @@ exports.updateSpeakingWorkshopSession = functions
         endedAt: admin.firestore.Timestamp.fromDate(endedAt),
         reviewUntil: admin.firestore.Timestamp.fromDate(reviewUntil),
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        lastAction: audit,
       });
+      transaction.set(auditRef, audit);
     });
     const updated = await sessionRef.get();
-    return {ok: true, session: serializeSpeakingWorkshopSession(updated, true)};
+    return {ok: true, session: {
+      ...serializeSpeakingWorkshopSession(updated, true),
+      actionHistory: await speakingWorkshopHistory(sessionId),
+    }};
   });
 
 exports.deleteSpeakingWorkshopSession = functions
@@ -739,16 +841,25 @@ exports.deleteSpeakingWorkshopSession = functions
 
     const sessionRef = firestore.collection("speakingWorkshopSessions")
       .doc(sessionId);
-    const sessionSnap = await sessionRef.get();
-    if (!sessionSnap.exists) {
-      throw new functions.https.HttpsError("not-found", "Workshop not found.");
-    }
-
     // Close registration before collecting attendees so an in-flight join
     // cannot leave a new membership behind while the session is removed.
-    await sessionRef.update({
-      registrationOpen: false,
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    const auditRef = speakingWorkshopAuditEvents(sessionId).doc();
+    const session = await firestore.runTransaction(async (transaction) => {
+      const snap = await transaction.get(sessionRef);
+      if (!snap.exists) {
+        throw new functions.https.HttpsError("not-found", "Workshop not found.");
+      }
+      const session = snap.data() || {};
+      const audit = speakingWorkshopAudit(
+        "delete_requested", context, role, session, null
+      );
+      transaction.update(sessionRef, {
+        registrationOpen: false,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        lastAction: audit,
+      });
+      transaction.set(auditRef, audit);
+      return session;
     });
     const attendees = await sessionRef.collection("attendees").get();
     const bulkWriter = firestore.bulkWriter();
@@ -760,6 +871,9 @@ exports.deleteSpeakingWorkshopSession = functions
     });
     await bulkWriter.close();
     await firestore.recursiveDelete(sessionRef);
+    await speakingWorkshopAuditEvents(sessionId).add(
+      speakingWorkshopAudit("delete", context, role, session, null)
+    );
 
     return {ok: true, sessionId};
   });

@@ -313,6 +313,10 @@
 .workshop-session-main small { display: block; margin-top: .45rem; color: #c6baf2; }
 .workshop-session-start { display: flex; align-items: center; gap: .38rem; margin-top: .55rem; color: #b9d3fa; font-size: .8rem; font-weight: 750; }
 .workshop-attendee-count { display: flex; align-items: center; gap: .4rem; margin-top: .6rem; color: var(--workshop-muted); font-size: .82rem; }
+.workshop-action-history { margin-top: .55rem; color: var(--workshop-muted); font-size: .8rem; }
+.workshop-action-history summary { width: max-content; font-weight: 750; cursor: pointer; }
+.workshop-action-history ol { display: grid; gap: .45rem; margin: .6rem 0; padding-left: 1.2rem; }
+.workshop-action-history li > span { display: block; margin-top: .1rem; overflow-wrap: anywhere; }
 .workshop-attendee-list { margin-top: .45rem; color: var(--workshop-muted); font-size: .8rem; }
 .workshop-attendee-list summary { width: max-content; color: #9dc5ff; font-weight: 750; cursor: pointer; }
 .workshop-attendee-list > div { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .45rem; }
