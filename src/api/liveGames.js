@@ -15,6 +15,8 @@
 //   }
 // }
 
+import { APTIS_OPINION_STRATEGY_GAME_TYPE } from "../components/listening/aptisListeningPart3StrategyData.js";
+
 import {
   auth,
   logAptisListeningLiveHosted,
@@ -726,6 +728,7 @@ export async function joinLiveGameByPin(pin) {
     game.type === PART4_EVIDENCE_LIVE_GAME_TYPE ||
     game.type === OTE_LISTENING_LIVE_GAME_TYPE ||
     game.type === LISTENING_STRATEGY_GAME_TYPE ||
+    game.type === APTIS_OPINION_STRATEGY_GAME_TYPE ||
     game.type === APTIS_LISTENING_PART2_LIVE_GAME_TYPE ||
     game.type === APTIS_LISTENING_PART3_LIVE_GAME_TYPE ||
     game.type === APTIS_LISTENING_PART4_LIVE_GAME_TYPE ||

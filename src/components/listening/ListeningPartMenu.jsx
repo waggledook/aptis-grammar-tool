@@ -24,6 +24,8 @@ export default function ListeningPartMenu({ user, aptisAccess, onSignIn }) {
   const [lockedActivity, setLockedActivity] = useState("");
   const part = getAptisListeningPart(partNumber);
   const isDemoMode = !!aptisAccess?.isDemoMode;
+  const canTeach = user?.role === "teacher" || user?.role === "admin";
+  const training = (part?.training || []).filter((activity) => !activity.teacherOnly || canTeach);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "auto" });
@@ -114,8 +116,8 @@ export default function ListeningPartMenu({ user, aptisAccess, onSignIn }) {
           <h2>Learn &amp; train</h2>
           <p>Build a reliable listening method before attempting a complete exam-style task.</p>
         </div>
-        <div className={`listening-part-activity-grid ${part.training.length > 1 ? "has-multiple" : ""}`}>
-          {part.training.map((activity) => renderActivity(activity, "training"))}
+        <div className={`listening-part-activity-grid ${training.length > 1 ? "has-multiple" : ""}`}>
+          {training.map((activity) => renderActivity(activity, "training"))}
         </div>
       </section>
 

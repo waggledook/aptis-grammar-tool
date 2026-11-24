@@ -1,0 +1,144 @@
+{
+  "recordings": [
+    {
+      "extractId": "extract-01",
+      "sourceFilename": "extract1.mp3",
+      "output": "public/audio/listening/part3/strategy/extract-01.mp3",
+      "durationSeconds": 17.795011,
+      "sha256": "d4f27ddcedb9d483e22efd1e54ce7c6f70a42af0a32eecdf635ddf23f2930c9d",
+      "streams": [
+        {
+          "codec_name": "mp3",
+          "sample_rate": "44100",
+          "channels": 1
+        }
+      ]
+    },
+    {
+      "extractId": "extract-02",
+      "sourceFilename": "extract2.mp3",
+      "output": "public/audio/listening/part3/strategy/extract-02.mp3",
+      "durationSeconds": 25.86771,
+      "sha256": "d56e2a519d0d3c1b78319c386d771303ddc7876f2a7318f457d0c72132fbe99e",
+      "streams": [
+        {
+          "codec_name": "mp3",
+          "sample_rate": "44100",
+          "channels": 1
+        }
+      ]
+    },
+    {
+      "extractId": "extract-03",
+      "sourceFilename": "extract3.mp3",
+      "output": "public/audio/listening/part3/strategy/extract-03.mp3",
+      "durationSeconds": 28.560907,
+      "sha256": "ac0c233929cc0cdab06df8a629cb04ea0df73191f29ce375dda338b5e48000a4",
+      "streams": [
+        {
+          "codec_name": "mp3",
+          "sample_rate": "44100",
+          "channels": 1
+        }
+      ]
+    },
+    {
+      "extractId": "extract-04",
+      "sourceFilename": "extract4.mp3",
+      "output": "public/audio/listening/part3/strategy/extract-04.mp3",
+      "durationSeconds": 32.479025,
+      "sha256": "86aaa7ff1303fbb568e87e0970e73a187bdf3bdc64d4f1bf474aa2683ac2b3ca",
+      "streams": [
+        {
+          "codec_name": "mp3",
+          "sample_rate": "44100",
+          "channels": 1
+        }
+      ]
+    },
+    {
+      "extractId": "extract-05",
+      "sourceFilename": "extract5.mp3",
+      "output": "public/audio/listening/part3/strategy/extract-05.mp3",
+      "durationSeconds": 29.218503,
+      "sha256": "68c9884a0801b39687f2fe5084a6317fbb9c0d004c1c892bcbc26133bf050207",
+      "streams": [
+        {
+          "codec_name": "mp3",
+          "sample_rate": "44100",
+          "channels": 1
+        }
+      ]
+    },
+    {
+      "extractId": "extract-06",
+      "sourceFilename": "extract6.mp3",
+      "output": "public/audio/listening/part3/strategy/extract-06.mp3",
+      "durationSeconds": 25.632472,
+      "sha256": "9fe444526ed83cd0f2acaf14e22f0269da316dd129a4db6d5657995388b91a82",
+      "streams": [
+        {
+          "codec_name": "mp3",
+          "sample_rate": "44100",
+          "channels": 1
+        }
+      ]
+    },
+    {
+      "extractId": "extract-07",
+      "sourceFilename": "extract7.mp3",
+      "output": "public/audio/listening/part3/strategy/extract-07.mp3",
+      "durationSeconds": 29.900998,
+      "sha256": "3d72d486ccbe0d59c5882303654a7154b863e1d810f00e7883be883c58cb96da",
+      "streams": [
+        {
+          "codec_name": "mp3",
+          "sample_rate": "44100",
+          "channels": 1
+        }
+      ]
+    },
+    {
+      "extractId": "extract-08",
+      "sourceFilename": "extract8.mp3",
+      "output": "public/audio/listening/part3/strategy/extract-08.mp3",
+      "durationSeconds": 34.485102,
+      "sha256": "71dca8bb2c2d04c0f8edc1620e23ff63f997d2c5d18046771c5aa956e477e3d5",
+      "streams": [
+        {
+          "codec_name": "mp3",
+          "sample_rate": "44100",
+          "channels": 1
+        }
+      ]
+    },
+    {
+      "extractId": "extract-09",
+      "sourceFilename": "extract9.mp3",
+      "output": "public/audio/listening/part3/strategy/extract-09.mp3",
+      "durationSeconds": 46.357052,
+      "sha256": "b95e02dcaecd075965ed58aac593af52094ff27152dca595eeac091b452e0917",
+      "streams": [
+        {
+          "codec_name": "mp3",
+          "sample_rate": "44100",
+          "channels": 1
+        }
+      ]
+    },
+    {
+      "extractId": "extract-10",
+      "sourceFilename": "extract10.mp3",
+      "output": "public/audio/listening/part3/strategy/extract-10.mp3",
+      "durationSeconds": 52.184127,
+      "sha256": "5ddf7026e035dad6ae23fddc9abd2bd5f628b1035dfef53a22a599b7083f01b0",
+      "streams": [
+        {
+          "codec_name": "mp3",
+          "sample_rate": "44100",
+          "channels": 1
+        }
+      ]
+    }
+  ]
+}

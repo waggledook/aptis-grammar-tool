@@ -23,6 +23,7 @@
     "content:export:keyword": "node scripts/export-keyword-content.mjs",
     "content:export:ote-listening-strategy": "node scripts/export-ote-listening-part2-strategy.mjs",
     "test:ote-listening-strategy": "node --test scripts/test-ote-listening-part2-strategy.mjs && node scripts/export-ote-listening-part2-strategy.mjs --check",
+    "test:aptis-listening-strategy": "node --experimental-vm-modules --test scripts/test-aptis-listening-part3-strategy.mjs",
     "content:export:opencloze": "node scripts/export-open-cloze-content.mjs",
     "content:export:wordformation": "node scripts/export-word-formation-content.mjs",
     "content:sync:keyword": "node scripts/sync-keyword-content.mjs",

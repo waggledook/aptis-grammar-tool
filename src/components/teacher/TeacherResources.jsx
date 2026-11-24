@@ -124,6 +124,13 @@ const PRODUCT_GROUPS = [
             tags: ["Direct link", "Opinion matching", "Live lesson"],
           },
           {
+            title: "Listening Part 3 · Who thinks what?",
+            description: "Choose short opinion-training extracts for a classroom lesson or live session, with separate listening attempts and evidence-led feedback.",
+            path: "/teacher-resources/listening-part3-opinion-training",
+            icon: Headphones,
+            tags: ["Strategy training", "10 extracts", "Live lesson"],
+          },
+          {
             title: "Listening Part 3 · Children's Independence",
             description: "Two-parent opinion-matching task with narrated instructions, a full dialogue and question-by-question live review.",
             path: "/listening/part3-teacher/childrens-independence",

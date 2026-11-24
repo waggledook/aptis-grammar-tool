@@ -226,6 +226,8 @@ import AptisListeningPart2LivePlayer from "./components/listening/AptisListening
 import ListeningPart3 from "./components/listening/ListeningPart3.jsx";
 import AptisListeningPart3LiveHost from "./components/listening/AptisListeningPart3LiveHost.jsx";
 import AptisListeningPart3LivePlayer from "./components/listening/AptisListeningPart3LivePlayer.jsx";
+import AptisListeningPart3StrategyLesson from "./components/listening/AptisListeningPart3StrategyLesson.jsx";
+import { AptisListeningPart3StrategyLiveHost, AptisListeningPart3StrategyLivePlayer } from "./components/listening/AptisListeningPart3StrategyLive.jsx";
 import AptisListeningPart4LiveHost from "./components/listening/AptisListeningPart4LiveHost.jsx";
 import AptisListeningPart4LivePlayer from "./components/listening/AptisListeningPart4LivePlayer.jsx";
 import ListeningPart4 from "./components/listening/ListeningPart4.jsx";
@@ -1051,6 +1053,8 @@ const isTeacherToolsRoute = ["/teacher-tools", "/teacher/transcription", "/live/
   || location.pathname === "/teacher-resources/aptis-grammar"
   || location.pathname === "/teacher-resources/grammar-vocabulary-mistakes"
   || location.pathname === "/teacher-resources/reading-part4-saving-smells"
+  || location.pathname === "/teacher-resources/listening-part3-opinion-training"
+  || location.pathname.startsWith("/live/aptis-listening-strategy/host/")
   || location.pathname.startsWith("/live/aptis-reading-part4/host/")
   || location.pathname.startsWith("/live/aptis-grammar/host/")
   || location.pathname.startsWith("/live/collocations/host/")
@@ -2860,6 +2864,8 @@ return (
   }
 />
 
+<Route path="/teacher-resources/listening-part3-opinion-training" element={<RequireTeacher user={user}><AptisListeningPart3StrategyLesson /></RequireTeacher>} />
+
 <Route
   path="/listening/parts/1/strategy-guide"
   element={<AptisListeningStrategyGuide partNumber="1" />}
@@ -3513,6 +3519,8 @@ return (
 <Route path="/live/aptis-listening-part2/play/:gameId" element={<RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}><AptisListeningPart2LivePlayer /></RequireSignedIn>} />
 <Route path="/live/aptis-listening-part3/host/:gameId" element={<RequireTeacher user={user}><AptisListeningPart3LiveHost user={user} /></RequireTeacher>} />
 <Route path="/live/aptis-listening-part3/play/:gameId" element={<RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}><AptisListeningPart3LivePlayer /></RequireSignedIn>} />
+<Route path="/live/aptis-listening-strategy/host/:gameId" element={<RequireTeacher user={user}><AptisListeningPart3StrategyLiveHost user={user} /></RequireTeacher>} />
+<Route path="/live/aptis-listening-strategy/play/:gameId" element={<RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}><AptisListeningPart3StrategyLivePlayer /></RequireSignedIn>} />
 <Route path="/live/aptis-listening-part4/host/:gameId" element={<RequireTeacher user={user}><AptisListeningPart4LiveHost user={user} /></RequireTeacher>} />
 <Route path="/live/aptis-listening-part4/play/:gameId" element={<RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}><AptisListeningPart4LivePlayer /></RequireSignedIn>} />
 <Route path="/live/cohesion-challenge/host/:gameId" element={<RequireTeacher user={user}><OteCohesionChallengeLiveHost user={user} /></RequireTeacher>} />

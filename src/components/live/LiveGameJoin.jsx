@@ -8,6 +8,7 @@ import { COHESION_CHALLENGE_GAME_TYPE } from "../../products/ote/data/oteAdvance
 import { FREE_THINGS_LESSON_GAME_TYPE } from "../../products/ote/data/oteAdvancedReadingPart3FreeThingsLesson.js";
 import { OTE_LISTENING_LIVE_GAME_TYPE } from "../../products/ote/data/oteListeningLive.js";
 import { LISTENING_STRATEGY_GAME_TYPE } from "../../products/ote/data/oteListeningPart2Strategy.js";
+import { APTIS_OPINION_STRATEGY_GAME_TYPE } from "../listening/aptisListeningPart3StrategyData.js";
 import {
   OTE_ADVANCED_READING_PART2_LIVE_GAME_TYPE,
   OTE_ADVANCED_READING_PART2_PARAGRAPH_LIVE_GAME_TYPE,
@@ -65,6 +66,8 @@ export default function LiveGameJoin() {
                 ? `/live/ote-listening/play/${gameId}`
               : type === LISTENING_STRATEGY_GAME_TYPE
                 ? `/live/ote-listening-strategy/play/${gameId}`
+              : type === APTIS_OPINION_STRATEGY_GAME_TYPE
+                ? `/live/aptis-listening-strategy/play/${gameId}`
               : type === OTE_ADVANCED_READING_PART2_LIVE_GAME_TYPE
                 ? `/live/ote-reading-part2/play/${gameId}`
               : type === OTE_ADVANCED_READING_PART2_PARAGRAPH_LIVE_GAME_TYPE

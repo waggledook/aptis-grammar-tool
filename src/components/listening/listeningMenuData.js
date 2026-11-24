@@ -75,6 +75,14 @@ export const APTIS_LISTENING_PARTS = [
         path: "/listening/parts/3/strategy-guide",
         demoAccess: "locked",
       },
+      {
+        id: "part3-opinion-training",
+        eyebrow: "Teacher-led training",
+        title: "Who thinks what?",
+        copy: "Use short conversations to distinguish agreement, disagreement and views left unclear, with classroom and live modes.",
+        path: "/teacher-resources/listening-part3-opinion-training",
+        teacherOnly: true,
+      },
     ],
     practice: {
       id: "part3-practice",
