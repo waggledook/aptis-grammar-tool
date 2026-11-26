@@ -621,10 +621,10 @@ function AptisWritingPart4Feedback({ feedback, status, error }) {
           <strong>Main strengths</strong>
           <ul>{(feedback.overall?.mainStrengths || []).map((item) => <li key={item}>{item}</li>)}</ul>
         </div>
-        <div>
+        {feedback.overall?.mainPriorities?.length ? <div>
           <strong>Main priorities</strong>
           <ul>{(feedback.overall?.mainPriorities || []).map((item) => <li key={item}>{item}</li>)}</ul>
-        </div>
+        </div> : null}
       </div>
 
       <p className="ai-p4-note">{feedback.estimatedLevel?.note}</p>

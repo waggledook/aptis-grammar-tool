@@ -8,6 +8,11 @@ import {
 import { WRITING_PART2_TASKS } from "../writing/WritingPart2.jsx";
 import { WRITING_PART3_TASKS } from "../writing/WritingPart3.jsx";
 import { WRITING_PART4_TASKS } from "../writing/WritingPart4Emails.jsx";
+import {
+  APTIS_WRITING_TEACHER_PART2_TASKS,
+  APTIS_WRITING_TEACHER_PART3_TASKS,
+  APTIS_WRITING_TEACHER_PART4_TASKS,
+} from "../writing/data/aptisWritingTeacherTasks.js";
 
 const PART_LABELS = {
   part1: "Part 1 · short answers",
@@ -24,10 +29,14 @@ const RATING_CRITERIA = [
 ];
 
 const TASKS_BY_PART = {
-  part2: WRITING_PART2_TASKS,
-  part3: WRITING_PART3_TASKS,
-  part4: WRITING_PART4_TASKS,
+  part2: [...WRITING_PART2_TASKS, ...APTIS_WRITING_TEACHER_PART2_TASKS],
+  part3: [...WRITING_PART3_TASKS, ...APTIS_WRITING_TEACHER_PART3_TASKS],
+  part4: [...WRITING_PART4_TASKS, ...APTIS_WRITING_TEACHER_PART4_TASKS],
 };
+const LEGACY_MODEL_OPTIONS = [
+  { id: "gpt-5.4-mini", label: "GPT-5.4 mini" },
+  { id: "gpt-5.6-luna", label: "GPT-5.6 Luna" },
+];
 
 function formatDate(value) {
   if (!value) return "Date unavailable";
@@ -237,7 +246,7 @@ function CandidatePreview({ candidate }) {
 
 function Summary({ summary }) {
   if (!summary) return null;
-  const rows = ["gpt-5.4-mini", "gpt-5.6-luna"];
+  const rows = Object.keys(summary.wins || {});
   return (
     <section style={panelStyle}>
       <h2 style={headingStyle}>Results so far</h2>
@@ -246,7 +255,7 @@ function Summary({ summary }) {
         <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 560 }}>
           <thead>
             <tr style={{ color: "#91a7cc", textAlign: "left", fontSize: "0.78rem" }}>
-              <th style={cellStyle}>Model</th><th style={cellStyle}>Preferred</th><th style={cellStyle}>Avg rating</th><th style={cellStyle}>Measured API spend</th>
+              <th style={cellStyle}>Model</th><th style={cellStyle}>Preferred</th><th style={cellStyle}>Reviewed</th><th style={cellStyle}>Avg rating</th><th style={cellStyle}>Failures</th><th style={cellStyle}>Estimated API spend</th>
             </tr>
           </thead>
           <tbody>
@@ -254,7 +263,9 @@ function Summary({ summary }) {
               <tr key={model} style={{ color: "#e6eeff", borderTop: "1px solid rgba(75, 99, 142, 0.3)" }}>
                 <td style={cellStyle}><strong>{model}</strong></td>
                 <td style={cellStyle}>{summary.wins?.[model] || 0}</td>
+                <td style={cellStyle}>{summary.reviewedComparisons?.[model] ?? "—"}</td>
                 <td style={cellStyle}>{summary.averageRating?.[model] ?? "—"} / 5</td>
+                <td style={cellStyle}>{summary.failures?.[model] ?? "—"}</td>
                 <td style={cellStyle}>${Number(summary.totalEstimatedCostUsd?.[model] || 0).toFixed(4)}</td>
               </tr>
             ))}
@@ -263,6 +274,7 @@ function Summary({ summary }) {
       </div>
       <div style={{ marginTop: "0.6rem", color: "#91a7cc", fontSize: "0.82rem" }}>
         {summary.ties || 0} tie{summary.ties === 1 ? "" : "s"} · {summary.neither || 0} neither
+        {summary.failures ? " · Spend and failures include unreviewed requests in the sample." : ""}
       </div>
     </section>
   );
@@ -292,6 +304,9 @@ export default function AdminAiModelLab({ user }) {
   const [candidates, setCandidates] = useState([]);
   const [selectedId, setSelectedId] = useState("");
   const [summary, setSummary] = useState(null);
+  const [modelOptions, setModelOptions] = useState([]);
+  const [selectedModels, setSelectedModels] = useState([]);
+  const [pricing, setPricing] = useState(null);
   const [loading, setLoading] = useState(true);
   const [running, setRunning] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -315,6 +330,11 @@ export default function AdminAiModelLab({ user }) {
       const result = await listAptisWritingModelLabCandidates({ kind, limit: 25 });
       setCandidates(result?.candidates || []);
       setSummary(result?.summary || null);
+      const availableModels = result?.models?.length ? result.models : LEGACY_MODEL_OPTIONS;
+      setModelOptions(availableModels);
+      setSelectedModels((current) => current.length === 2 && current.every((id) => availableModels.some((model) => model.id === id))
+        ? current : result?.defaultModels || availableModels.map((model) => model.id));
+      setPricing(result?.pricingDate ? { date: result.pricingDate, source: result.pricingSource } : null);
       setSelectedId((current) => (result?.candidates || []).some((candidate) => candidate.id === current)
         ? current
         : result?.candidates?.[0]?.id || "");
@@ -343,7 +363,7 @@ export default function AdminAiModelLab({ user }) {
   }
 
   async function runComparison() {
-    if (!selected || !selectedPayload) return;
+    if (!selected || !selectedPayload || selectedModels.length !== 2 || selectedModels[0] === selectedModels[1]) return;
     setRunning(true);
     setError("");
     setComparison(null);
@@ -351,6 +371,7 @@ export default function AdminAiModelLab({ user }) {
     try {
       const result = await runAptisWritingModelLabComparison({
         ...selectedPayload,
+        models: selectedModels,
         sourceCandidateId: selected.id,
         taskId: selected.taskId || "",
       });
@@ -403,13 +424,44 @@ export default function AdminAiModelLab({ user }) {
         <div style={{ color: "#75a7ff", fontSize: "0.78rem", fontWeight: 900, letterSpacing: "0.12em", textTransform: "uppercase" }}>AI Model Lab</div>
         <h1 style={{ color: "#f8fbff", margin: "0.3rem 0 0.4rem" }}>Blind Aptis Writing comparison</h1>
         <p style={{ ...mutedStyle, margin: 0, maxWidth: 800 }}>
-          Replay saved student writing through GPT-5.4 mini and GPT-5.6 Luna using the production prompt and JSON schema. Score the two responses before the model names, speed, tokens, and cost are revealed.
+          Choose two models and replay saved student writing using the production prompt and grading scale. Review the feedback before the model names, speed, tokens, and cost are revealed.
         </p>
       </header>
 
       {error ? <div role="alert" style={{ ...panelStyle, borderColor: "#a6414a", color: "#ffd7dc", marginBottom: "1rem" }}>{error}</div> : null}
 
       <Summary summary={summary} />
+
+      <section style={{ ...panelStyle, marginTop: "1rem" }}>
+        <h2 style={headingStyle}>Models to compare</h2>
+        <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", marginTop: "0.75rem" }}>
+          {[0, 1].map((index) => (
+            <label key={index} style={{ display: "grid", gap: "0.35rem", color: "#cbd9f2" }}>
+              <span>{index === 0 ? "First model" : "Second model"}</span>
+              <select
+                value={selectedModels[index] || ""}
+                disabled={loading || running || saving || !modelOptions.length}
+                style={selectStyle}
+                onChange={(event) => {
+                  setSelectedModels((current) => current.map((model, position) => position === index ? event.target.value : model));
+                  resetReview();
+                }}
+              >
+                {!modelOptions.length ? <option value="">Loading models…</option> : null}
+                {modelOptions.map((model) => <option key={model.id} value={model.id} disabled={model.id === selectedModels[1 - index]}>{model.label}</option>)}
+              </select>
+            </label>
+          ))}
+        </div>
+        {pricing ? (
+          <p style={{ ...mutedStyle, fontSize: "0.82rem", marginBottom: 0 }}>
+            Standard USD rates per million tokens, checked {pricing.date}: {selectedModels.map((id) => {
+              const model = modelOptions.find((option) => option.id === id);
+              return model ? `${model.label}: $${model.input} input / $${model.output} output` : "";
+            }).join("; ")}. {pricing.source ? <a href={pricing.source} target="_blank" rel="noreferrer">Pricing source</a> : null} Cached reads and writes are included in cost estimates. Response A/B order is random.
+          </p>
+        ) : null}
+      </section>
 
       <section style={{ ...panelStyle, marginTop: "1rem" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "end", gap: "0.8rem", flexWrap: "wrap" }}>
@@ -421,6 +473,7 @@ export default function AdminAiModelLab({ user }) {
             <select
               aria-label="Writing part"
               value={partFilter}
+              disabled={loading || running || saving}
               style={selectStyle}
               onChange={(event) => {
                 const kind = event.target.value;
@@ -432,7 +485,7 @@ export default function AdminAiModelLab({ user }) {
               <option value="all">All writing parts</option>
               {Object.entries(PART_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
             </select>
-            <button type="button" className="ghost-btn" style={{ marginLeft: 0 }} onClick={() => loadCandidates()} disabled={loading}>
+            <button type="button" className="ghost-btn" style={{ marginLeft: 0 }} onClick={() => loadCandidates()} disabled={loading || running || saving}>
               {loading ? "Loading…" : "Refresh sample"}
             </button>
           </div>
@@ -449,7 +502,7 @@ export default function AdminAiModelLab({ user }) {
                   <button
                     key={candidate.id}
                     type="button"
-                    disabled={!usable}
+                    disabled={!usable || running || saving}
                     onClick={() => { setSelectedId(candidate.id); resetReview(); }}
                     style={{
                       textAlign: "left",
@@ -473,7 +526,7 @@ export default function AdminAiModelLab({ user }) {
             </div>
             <div>
               <CandidatePreview candidate={selected} />
-              <button type="button" className="review-btn" onClick={runComparison} disabled={!selectedPayload || running} style={{ marginTop: "1rem" }}>
+              <button type="button" className="review-btn" onClick={runComparison} disabled={!selectedPayload || selectedModels.length !== 2 || running || saving} style={{ marginTop: "1rem" }}>
                 {running ? "Running both models…" : "Run blind comparison"}
               </button>
               {running ? <p style={{ ...mutedStyle, fontSize: "0.82rem", marginBottom: 0 }}>Part 4 can take a couple of minutes. Both requests are running at the same time.</p> : null}
@@ -486,6 +539,7 @@ export default function AdminAiModelLab({ user }) {
         <>
           <section style={{ marginTop: "1rem" }}>
             <h2 style={{ ...headingStyle, marginBottom: "0.75rem" }}>2. Compare the feedback</h2>
+            {comparison.promptVersion ? <p style={{ ...mutedStyle, fontSize: "0.8rem" }}>Grading version: {comparison.promptVersion}</p> : null}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "1rem" }} className="model-lab-comparison-grid">
               {["A", "B"].map((label) => {
                 const option = comparison.options?.[label];
@@ -512,8 +566,9 @@ export default function AdminAiModelLab({ user }) {
                     <div key={label} style={{ padding: "0.8rem", borderRadius: "0.75rem", background: "rgba(4, 12, 28, 0.64)", color: "#e7efff" }}>
                       <strong>Response {label}: {reveal[label]?.model}</strong>
                       <div style={{ color: "#9fb4d9", marginTop: "0.35rem", fontSize: "0.84rem" }}>
-                        {reveal[label]?.latencyMs ? `${(reveal[label].latencyMs / 1000).toFixed(1)}s` : "No latency"} · ${Number(reveal[label]?.estimatedCostUsd || 0).toFixed(5)} · {reveal[label]?.usage?.input_tokens || 0} input / {reveal[label]?.usage?.output_tokens || 0} output tokens
+                        {reveal[label]?.latencyMs ? `${(reveal[label].latencyMs / 1000).toFixed(1)}s` : "No latency"} · {reveal[label]?.estimatedCostUsd == null ? "Cost unavailable" : `$${Number(reveal[label].estimatedCostUsd).toFixed(5)}`} · {reveal[label]?.usage?.input_tokens || 0} input / {reveal[label]?.usage?.output_tokens || 0} output tokens
                       </div>
+                      {reveal[label]?.error ? <p style={{ color: "#ffbdc4", fontSize: "0.84rem", marginBottom: 0 }}>{reveal[label].error}</p> : null}
                     </div>
                   ))}
                 </div>

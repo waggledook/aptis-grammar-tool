@@ -14,6 +14,15 @@ const {
 const {
   SPEAKING_WORKSHOP_REVIEW_DAYS,
 } = require("./speaking-workshop-review-policy");
+const {
+  MODEL_LAB_CATALOG,
+  MODEL_LAB_PRICING_DATE,
+  MODEL_LAB_PRICING_SOURCE,
+  DEFAULT_MODEL_LAB_MODELS,
+  resolveModelLabModels,
+  estimateModelLabCost,
+  summarizeModelLabEvaluations,
+} = require("./aptis-writing-model-lab");
 
 // ---------- init Admin (safe if called twice) ----------
 try { admin.app(); } catch { admin.initializeApp(); }
@@ -2223,7 +2232,9 @@ const APTIS_WRITING_PART4_FEEDBACK_SCHEMA = {
             "A2 range",
             "B1 range",
             "B1+/B2 range",
+            "B2 range",
             "B2+/C1 range",
+            "C1 range",
             "C1+ range",
           ],
         },
@@ -4763,6 +4774,10 @@ function normalizePart4Payload(data) {
   };
 }
 
+// British Council Part Four marking descriptors:
+// https://www.britishcouncil.org/sites/default/files/aptis_general_-_practice_test_answer_key_writing.pdf
+const APTIS_WRITING_PART4_PROMPT_VERSION = "2026-11-26-c1-calibration";
+
 function buildAptisWritingPart4Prompt(payload) {
   return [
     "You are an English exam writing feedback assistant for Aptis General Writing Part 4.",
@@ -4828,26 +4843,26 @@ function buildAptisWritingPart4Prompt(payload) {
     "- Keep language realistic for the student's apparent level, but allow the improved version to preserve ambition and range. Do not create a perfect C2 template, and do not flatten a strong answer into basic English.",
     "- The improved formal email must respond to the specific source and formal prompt, not a generic template.",
     "- For strong answers, make minimal edits: correct errors, improve precision, and keep the student's style. Do not rewrite the whole email into a safer but less advanced version.",
+    "- If an email already works well, improvedVersion may reproduce it unchanged. Do not invent weaknesses or changes to fill feedback fields. mainPriorities may be empty when no substantive improvement is needed; label optional polish explicitly and do not use it to lower the grade.",
     "",
     "Use broad estimated-level labels only. Do not present the level as an official Aptis score.",
     "Level calibration:",
-    "- Do not cap a response at B1+/B2 just because it contains a few spelling errors, article/preposition issues, or isolated awkward phrases.",
-    "- If both emails are task-specific, clearly different in register, cohesive, and use a strong range of vocabulary and formal/informal phrasing, consider B2+/C1 range or C1+ even with minor surface errors.",
-    "- C1-level Part 4 writing may still contain occasional slips. Judge the overall control, register awareness, task fulfilment, cohesion, and vocabulary range.",
-    "- Reserve B1+/B2 range for answers with generally clear communication but limited range, inconsistent register, underdeveloped content, or frequent errors that noticeably reduce control.",
-    "- A student with strong register contrast, specific content, confident formal phrasing, and mostly accurate complex language should normally be at least B2+/C1 range.",
+    "- Judge the language actually produced, not a learner's self-description of being shy, lacking fluency or finding English difficult.",
+    "- Use the British Council Aptis General Part 4 descriptors as the reference: C1 includes fulfilment of both tasks, two clearly different appropriate registers, a range of accurately used complex grammar and vocabulary, and clear links between ideas. Minor errors and occasional awkward lexical choices are compatible with C1.",
+    "- B1+/B2 range: communication is generally clear, but range is limited, register is inconsistent, content is underdeveloped, or recurring errors noticeably reduce control.",
+    "- B2 range: both tasks are addressed with generally appropriate register, some accurately used complex structures, sufficient vocabulary and clear organisation, but range, precision or cohesive flexibility is still limited.",
+    "- B2+/C1 range: strong B2 with emerging C1 features, but a specific, evidenced limitation in task fulfilment, register, grammatical range/control, vocabulary or cohesion prevents a secure C1 judgement. Identify that limitation in estimatedLevel.note. Do not use this as a default cautious label for any strong answer.",
+    "- C1 range: choose this when both emails fulfil the actual prompts, clearly contrast in register, and together show varied, mostly accurate complex grammar, precise vocabulary and effective cohesion. Assess the pair together; the short informal email can demonstrate advanced control through idiomatic simplicity, contractions and concise personal phrasing.",
+    "- C1+ range: reserve this for clearly above-C1 evidence within the task, with exceptional flexibility, nuance, naturalness and sustained precision across both emails. This is an above-range task estimate, not an official C2 result. C1 does not require this exceptional standard.",
+    "- Do not demand rare words, inversion, extra content points or elaborate grammar for their own sake. Assess effective language choices against what each email needs.",
+    "- A few spelling slips, article/preposition issues, optional stylistic preferences, an acceptable word count, or a wish for more evidence do not by themselves justify withholding C1. Limited sample length should affect confidence rather than impose a level ceiling.",
+    "- Before returning JSON, check that estimatedLevel agrees with the criterion feedback. If all criteria describe strong, accurate, varied and task-complete writing, use C1 range or above unless you can cite a substantive counterexample. Conversely, do not award C1 solely because the text is error-free if its language range is basic.",
     "Keep feedback concise so the full JSON response completes. Return only valid JSON using the required schema.",
     "",
     "Submission:",
     JSON.stringify(payload, null, 2),
   ].join("\n");
 }
-
-const APTIS_WRITING_MODEL_LAB_MODELS = ["gpt-5.4-mini", "gpt-5.6-luna"];
-const APTIS_WRITING_MODEL_LAB_PRICING = {
-  "gpt-5.4-mini": { input: 0.75, cachedInput: 0.075, output: 4.5 },
-  "gpt-5.6-luna": { input: 0.2, cachedInput: 0.02, cacheWriteInput: 0.25, output: 1.2 },
-};
 
 async function requireAdminForModelLab(context) {
   if (!context.auth?.uid) {
@@ -4937,6 +4952,7 @@ function buildAptisWritingModelLabRequest(data) {
       kind,
       payload,
       prompt: buildAptisWritingPart4Prompt(payload),
+      promptVersion: APTIS_WRITING_PART4_PROMPT_VERSION,
       schemaName: "aptis_writing_part4_feedback",
       schema: APTIS_WRITING_PART4_FEEDBACK_SCHEMA,
       verbosity: "medium",
@@ -4968,29 +4984,6 @@ function buildAptisWritingModelLabRequest(data) {
   throw new functions.https.HttpsError("invalid-argument", "Choose Aptis Writing part1, part2, part3, or part4.");
 }
 
-function estimateModelLabCost(model, usage = {}) {
-  const price = APTIS_WRITING_MODEL_LAB_PRICING[model];
-  if (!price) return null;
-
-  const inputTokens = Number(usage.input_tokens || 0);
-  const outputTokens = Number(usage.output_tokens || 0);
-  const details = usage.input_tokens_details || {};
-  const cachedTokens = Math.min(inputTokens, Number(details.cached_tokens || 0));
-  const cacheWriteTokens = Math.min(
-    Math.max(0, inputTokens - cachedTokens),
-    Number(details.cache_write_tokens || details.cache_creation_tokens || 0)
-  );
-  const regularTokens = Math.max(0, inputTokens - cachedTokens - cacheWriteTokens);
-  const usd = (
-    regularTokens * price.input +
-    cachedTokens * price.cachedInput +
-    cacheWriteTokens * (price.cacheWriteInput || price.input) +
-    outputTokens * price.output
-  ) / 1_000_000;
-
-  return Number(usd.toFixed(8));
-}
-
 async function runAptisWritingModelLabModel(model, config) {
   const startedAt = Date.now();
   try {
@@ -5002,6 +4995,8 @@ async function runAptisWritingModelLabModel(model, config) {
       },
       body: JSON.stringify({
         model,
+        store: false,
+        service_tier: "default",
         input: config.prompt,
         reasoning: { effort: "low" },
         max_output_tokens: config.maxOutputTokens,
@@ -5017,12 +5012,25 @@ async function runAptisWritingModelLabModel(model, config) {
       }),
     });
     const responseJson = await apiResponse.json().catch(() => null);
+    const meta = {
+      model,
+      latencyMs: Date.now() - startedAt,
+      responseId: responseJson?.id || null,
+      usage: responseJson?.usage || null,
+      estimatedCostUsd: responseJson?.usage ? estimateModelLabCost(model, responseJson.usage) : null,
+    };
     if (!apiResponse.ok) {
       return {
         ok: false,
-        model,
-        latencyMs: Date.now() - startedAt,
+        ...meta,
         error: cleanString(responseJson?.error?.message || "The model request failed.", 500),
+      };
+    }
+    if (responseJson?.status === "incomplete") {
+      return {
+        ok: false,
+        ...meta,
+        error: `The model did not complete the response (${responseJson.incomplete_details?.reason || "incomplete"}).`,
       };
     }
 
@@ -5033,22 +5041,15 @@ async function runAptisWritingModelLabModel(model, config) {
     } catch {
       return {
         ok: false,
-        model,
-        latencyMs: Date.now() - startedAt,
-        responseId: responseJson?.id || null,
-        usage: responseJson?.usage || null,
+        ...meta,
         error: "The model returned invalid structured JSON.",
       };
     }
 
     return {
       ok: true,
-      model,
+      ...meta,
       feedback,
-      latencyMs: Date.now() - startedAt,
-      responseId: responseJson?.id || null,
-      usage: responseJson?.usage || null,
-      estimatedCostUsd: estimateModelLabCost(model, responseJson?.usage || {}),
     };
   } catch (error) {
     console.error("[runAptisWritingModelLabModel] request failed", { model, error });
@@ -5105,49 +5106,7 @@ function modelLabCandidateFromSnapshot(kind, snap) {
 
 async function getAptisWritingModelLabSummary() {
   const snap = await firestore.collection("aiModelEvaluations").limit(500).get();
-  const reviewed = snap.docs.map((docSnap) => docSnap.data() || {}).filter((entry) => entry.status === "reviewed");
-  const summary = {
-    reviewed: reviewed.length,
-    wins: Object.fromEntries(APTIS_WRITING_MODEL_LAB_MODELS.map((model) => [model, 0])),
-    ties: 0,
-    neither: 0,
-    totalEstimatedCostUsd: Object.fromEntries(APTIS_WRITING_MODEL_LAB_MODELS.map((model) => [model, 0])),
-    averageRating: Object.fromEntries(APTIS_WRITING_MODEL_LAB_MODELS.map((model) => [model, null])),
-  };
-  const ratingTotals = Object.fromEntries(APTIS_WRITING_MODEL_LAB_MODELS.map((model) => [model, { sum: 0, count: 0 }]));
-
-  reviewed.forEach((entry) => {
-    const preference = entry.review?.preference;
-    if (preference === "tie") summary.ties += 1;
-    else if (preference === "neither") summary.neither += 1;
-    else {
-      const winningModel = entry.outputs?.[preference]?.model;
-      if (winningModel && summary.wins[winningModel] !== undefined) summary.wins[winningModel] += 1;
-    }
-
-    Object.values(entry.outputs || {}).forEach((output) => {
-      if (output?.model && output.ok) {
-        summary.totalEstimatedCostUsd[output.model] += Number(output.estimatedCostUsd || 0);
-      }
-    });
-    ["A", "B"].forEach((label) => {
-      const model = entry.outputs?.[label]?.model;
-      const ratings = entry.review?.ratings?.[label] || {};
-      Object.values(ratings).forEach((value) => {
-        if (model && ratingTotals[model] && Number.isFinite(Number(value))) {
-          ratingTotals[model].sum += Number(value);
-          ratingTotals[model].count += 1;
-        }
-      });
-    });
-  });
-
-  APTIS_WRITING_MODEL_LAB_MODELS.forEach((model) => {
-    summary.totalEstimatedCostUsd[model] = Number(summary.totalEstimatedCostUsd[model].toFixed(6));
-    const ratings = ratingTotals[model];
-    summary.averageRating[model] = ratings.count ? Number((ratings.sum / ratings.count).toFixed(2)) : null;
-  });
-  return summary;
+  return summarizeModelLabEvaluations(snap.docs.map((docSnap) => docSnap.data() || {}));
 }
 
 exports.listAptisWritingModelLabCandidates = functions
@@ -5177,7 +5136,14 @@ exports.listAptisWritingModelLabCandidates = functions
       return snap.docs.map((docSnap) => modelLabCandidateFromSnapshot(kind, docSnap)).filter(Boolean);
     }));
     const candidates = rows.flat().sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || "")));
-    return { candidates, summary: await getAptisWritingModelLabSummary() };
+    return {
+      candidates,
+      summary: await getAptisWritingModelLabSummary(),
+      models: MODEL_LAB_CATALOG,
+      defaultModels: DEFAULT_MODEL_LAB_MODELS,
+      pricingDate: MODEL_LAB_PRICING_DATE,
+      pricingSource: MODEL_LAB_PRICING_SOURCE,
+    };
   });
 
 exports.runAptisWritingModelLabComparison = functions
@@ -5189,9 +5155,15 @@ exports.runAptisWritingModelLabComparison = functions
       throw new functions.https.HttpsError("failed-precondition", "Missing OPENAI_API_KEY in the Functions environment.");
     }
 
+    let models;
+    try {
+      models = resolveModelLabModels(data?.models);
+    } catch (error) {
+      throw new functions.https.HttpsError("invalid-argument", error.message);
+    }
     const config = buildAptisWritingModelLabRequest(data);
     const results = await Promise.all(
-      APTIS_WRITING_MODEL_LAB_MODELS.map((model) => runAptisWritingModelLabModel(model, config))
+      models.map((model) => runAptisWritingModelLabModel(model, config))
     );
     const ordered = Math.random() < 0.5 ? results : [results[1], results[0]];
     const outputs = { A: ordered[0], B: ordered[1] };
@@ -5201,6 +5173,8 @@ exports.runAptisWritingModelLabComparison = functions
       sourceCandidateId: cleanString(data?.sourceCandidateId || "", 160),
       taskId: cleanString(config.payload?.taskId || data?.taskId || "", 120),
       input: config.payload,
+      promptVersion: config.promptVersion || null,
+      pricingDate: MODEL_LAB_PRICING_DATE,
       outputs,
       status: "pending_review",
       createdByUid: context.auth.uid,
@@ -5216,6 +5190,7 @@ exports.runAptisWritingModelLabComparison = functions
     return {
       evaluationId: evaluationRef.id,
       kind: config.kind,
+      promptVersion: config.promptVersion || null,
       options: { A: blindOutput(outputs.A), B: blindOutput(outputs.B) },
     };
   });
@@ -5273,6 +5248,7 @@ exports.submitAptisWritingModelLabReview = functions
       reveal[label] = {
         model: output.model || "unknown",
         ok: !!output.ok,
+        error: output.ok ? null : output.error || "The model request failed.",
         latencyMs: output.latencyMs || null,
         usage: output.usage || null,
         estimatedCostUsd: output.estimatedCostUsd ?? null,
@@ -8701,6 +8677,7 @@ exports.generateAptisWritingPart4Feedback = functions
       usage: responseJson?.usage || null,
       generatedAt: new Date().toISOString(),
       quota: creditReservation,
+      promptVersion: APTIS_WRITING_PART4_PROMPT_VERSION,
     };
     await logAiFeedbackGeneratedServer(
       context,
